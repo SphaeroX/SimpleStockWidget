@@ -12,7 +12,7 @@ Das iOS-Widget (SwiftUI + WidgetKit) zeigt dieselben Daten im gleichen Layout wi
 ## Kontext & Abhängigkeiten
 
 - **Voraussetzung:** Task_10 archiviert. Mac mit Xcode oder macOS-CI (z. B. GitHub Actions) verfügbar – sonst Task anhalten und Nutzer fragen.
-- **Relevantes Vorwissen:** Payload-Format und Layoutregeln aus Tasks 06, 07, 10 (siehe README). `home_widget`-Doku für iOS (App Group, `HomeWidget.setAppGroupId`).
+- **Relevantes Vorwissen:** Payload-Format und Layoutregeln aus Tasks 06, 07, 10 (siehe README, Abschnitt Widget-Vertrag). Android-Referenz: `android/app/src/main/kotlin/de/sphaerox/simple_stock_widget/widget/` (`WidgetLayout.kt` mit `split`, `rowsPerColumn`, `headerText`, `isLoading`; `WidgetColors.kt`; Testfälle in `tests/android/`). Dart setzt `HomeWidgetStorage.iOSWidgetName = 'StockWidget'` (in `lib/widget_sync/widget_storage.dart`). `home_widget`-Doku für iOS (App Group, `HomeWidget.setAppGroupId`).
 
 ## Umfang
 

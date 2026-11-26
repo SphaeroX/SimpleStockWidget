@@ -6,6 +6,9 @@ import kotlin.math.max
 import kotlin.math.min
 
 /** Reine Layout-Logik des Widgets (ohne Glance-Abhängigkeit, unit-getestet). */
+/** Kopfzeilentext und ob er als Warnung (z. B. Offline, veraltet) hervorgehoben wird. */
+data class HeaderText(val text: String, val warning: Boolean)
+
 object WidgetLayout {
   const val HEADER_DP = 24f
   const val PADDING_DP = 24f
@@ -46,5 +49,16 @@ object WidgetLayout {
   fun isLoading(loadingValue: String?, nowMs: Long, staleAfterMs: Long = 60_000L): Boolean {
     val started = loadingValue?.toLongOrNull() ?: return false
     return nowMs - started in 0 until staleAfterMs
+  }
+
+  /** Wählt die Kopfzeile: Laden > Fehler > veraltet > normal. Texte kommen fertig aus Dart. */
+  fun headerText(payload: WidgetPayload?, error: String?, nowMs: Long, loading: Boolean): HeaderText {
+    if (loading) return HeaderText("Aktualisiere …", false)
+    if (!error.isNullOrBlank()) return HeaderText(error, true)
+    val staleAt = payload?.staleAtMs
+    if (payload != null && staleAt != null && nowMs > staleAt && payload.staleLabel != null) {
+      return HeaderText(payload.staleLabel, true)
+    }
+    return HeaderText("Letzter Abruf: ${payload?.updatedLabel?.ifEmpty { null } ?: "–"}", false)
   }
 }

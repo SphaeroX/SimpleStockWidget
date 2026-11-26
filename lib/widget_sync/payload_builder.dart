@@ -21,5 +21,6 @@ WidgetRow buildRow(WatchlistEntry e, Quote q, AppSettings settings, Map<String, 
     change: formatChange(mode, change: c.change, percent: c.changePercent, reference: c.price),
     currency: currencySymbol(c.currency),
     direction: direction,
+    dim: const {MarketState.closed, MarketState.pre, MarketState.post}.contains(q.marketState),
   );
 }

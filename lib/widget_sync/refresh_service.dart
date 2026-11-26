@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../currency/currency.dart';
 import '../format/time_format.dart';
 import '../quotes/quote_provider.dart';
@@ -7,6 +9,7 @@ import '../watchlist/watchlist_repository.dart';
 import 'payload_builder.dart';
 import 'widget_keys.dart';
 import 'widget_payload.dart';
+import 'widget_status.dart';
 import 'widget_storage.dart';
 import 'widget_sync.dart';
 
@@ -48,6 +51,9 @@ class RefreshService {
     if (showLoading) await _storage.updateWidget();
     try {
       return await _refresh();
+    } catch (e) {
+      await _markError(e);
+      rethrow;
     } finally {
       await _storage.saveString(WidgetKeys.loading, '');
     }
@@ -73,10 +79,33 @@ class RefreshService {
     final now = _clock();
     final rows = [
       for (final e in entries)
-        if (batch.quotes[e.symbol] case final q?) buildRow(e, q, settings, rates),
+        if (batch.quotes[e.symbol] case final q?)
+          buildRow(e, q, settings, rates)
+        else
+          WidgetRow.failed(e.effectiveName),
     ];
-    final payload = WidgetPayload(updatedAt: now, updatedLabel: formatUpdatedLabel(now), rows: rows);
+    final label = formatUpdatedLabel(now);
+    final payload = WidgetPayload(
+      updatedAt: now,
+      updatedLabel: label,
+      rows: rows,
+      staleAt: staleAt(now, settings.updateInterval),
+      staleLabel: withStand('Veraltet', label),
+      empty: entries.isEmpty,
+    );
+    await _storage.saveString(WidgetKeys.error, '');
     await _sync.publish(payload);
     return payload;
+  }
+
+  /// Totalfehler: alte Zeilen bleiben unangetastet, nur der Fehlerhinweis wird gesetzt.
+  Future<void> _markError(Object error) async {
+    String? oldLabel;
+    try {
+      final old = await _storage.readString(WidgetKeys.payload);
+      if (old != null) oldLabel = (jsonDecode(old) as Map<String, dynamic>)['updatedLabel'] as String?;
+    } catch (_) {}
+    await _storage.saveString(WidgetKeys.error, withStand(errorLabelFor(error), oldLabel));
+    await _storage.updateWidget();
   }
 }

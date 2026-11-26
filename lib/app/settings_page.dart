@@ -55,6 +55,8 @@ class SettingsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             const Text('Android kann Hintergrund-Updates je nach Akku-Optimierung etwas verzögern.'),
+            const SizedBox(height: 24),
+            const WidgetLegend(),
           ],
         ),
       ),
@@ -66,4 +68,39 @@ class SettingsPage extends ConsumerWidget {
     ChangeMode.amount => 'Betrag',
     ChangeMode.both => 'Beides',
   };
+}
+
+/// Erklärt die Markierungen im Widget.
+class WidgetLegend extends StatelessWidget {
+  const WidgetLegend({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    Widget line(String what, String meaning) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(what, style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          ),
+          Expanded(child: Text(meaning)),
+        ],
+      ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Legende Widget', style: t.titleSmall),
+        const SizedBox(height: 8),
+        line('Grau', 'Börse geschlossen oder vor-/nachbörslich – Kurs vom letzten Handel'),
+        line('–', 'Kurs konnte nicht geladen werden (z. B. unbekanntes Symbol)'),
+        line('Offline · Stand …', 'Letzter Abruf fehlgeschlagen, angezeigt werden die letzten Daten'),
+        line('Veraltet · Stand …', 'Daten älter als das doppelte Update-Intervall'),
+        line('▲ / ▼', 'Richtung der Tagesveränderung (nur im einspaltigen Widget)'),
+      ],
+    );
+  }
 }

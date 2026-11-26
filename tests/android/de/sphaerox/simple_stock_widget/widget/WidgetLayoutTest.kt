@@ -85,3 +85,43 @@ class LoadingTest {
     assertEquals(false, WidgetLayout.isLoading("10000", 100_000L))
   }
 }
+
+class HeaderTextTest {
+  private val p = WidgetPayload("22:48 Mi.", emptyList(), staleAtMs = 1_000L, staleLabel = "Veraltet · Stand 22:48 Mi.")
+
+  @Test
+  fun normal() {
+    assertEquals(HeaderText("Letzter Abruf: 22:48 Mi.", false), WidgetLayout.headerText(p, error = "", nowMs = 500L, loading = false))
+  }
+
+  @Test
+  fun laden() {
+    assertEquals(HeaderText("Aktualisiere …", false), WidgetLayout.headerText(p, error = "Offline", nowMs = 500L, loading = true))
+  }
+
+  @Test
+  fun fehlerSchlaegtVeraltet() {
+    assertEquals(HeaderText("Offline · Stand 22:48 Mi.", true), WidgetLayout.headerText(p, error = "Offline · Stand 22:48 Mi.", nowMs = 5_000L, loading = false))
+  }
+
+  @Test
+  fun veraltet() {
+    assertEquals(HeaderText("Veraltet · Stand 22:48 Mi.", true), WidgetLayout.headerText(p, error = null, nowMs = 5_000L, loading = false))
+  }
+
+  @Test
+  fun ohneDaten() {
+    assertEquals(HeaderText("Letzter Abruf: –", false), WidgetLayout.headerText(null, error = null, nowMs = 0L, loading = false))
+  }
+
+  @Test
+  fun payloadParstStatusfelder() {
+    val parsed =
+        WidgetPayload.parse(
+            """{"updatedLabel":"x","staleAt":5,"staleLabel":"V","empty":true,"rows":[{"name":"A","price":"1","change":"2","dir":"up","dim":true,"error":true}]}""")!!
+    assertEquals(5L, parsed.staleAtMs)
+    assertEquals(true, parsed.empty)
+    assertEquals(true, parsed.rows[0].dim)
+    assertEquals(true, parsed.rows[0].error)
+  }
+}

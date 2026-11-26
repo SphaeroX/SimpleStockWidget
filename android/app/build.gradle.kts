@@ -62,4 +62,5 @@ dependencies {
     implementation("androidx.glance:glance-material3:1.2.0")
     implementation("androidx.work:work-runtime:2.11.2")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20250517")
 }

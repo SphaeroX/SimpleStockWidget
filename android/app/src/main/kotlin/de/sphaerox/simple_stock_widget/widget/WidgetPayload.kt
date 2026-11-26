@@ -6,14 +6,29 @@ import org.json.JSONObject
 object WidgetKeys {
   const val PAYLOAD = "ssw_payload"
   const val LOADING = "ssw_loading"
+  const val ERROR = "ssw_error"
   const val RELOAD_URI = "simplestock://reload"
   const val SCHEDULE_URI = "simplestock://schedule"
   const val PERIODIC_WORK = "ssw_periodic_refresh"
 }
 
-data class WidgetRow(val name: String, val price: String, val change: String, val dir: String, val currency: String = "")
+data class WidgetRow(
+    val name: String,
+    val price: String,
+    val change: String,
+    val dir: String,
+    val currency: String = "",
+    val dim: Boolean = false,
+    val error: Boolean = false,
+)
 
-data class WidgetPayload(val updatedLabel: String, val rows: List<WidgetRow>) {
+data class WidgetPayload(
+    val updatedLabel: String,
+    val rows: List<WidgetRow>,
+    val staleAtMs: Long? = null,
+    val staleLabel: String? = null,
+    val empty: Boolean = false,
+) {
   companion object {
     val preview =
         WidgetPayload(
@@ -33,9 +48,23 @@ data class WidgetPayload(val updatedLabel: String, val rows: List<WidgetRow>) {
         val rows =
             (0 until (arr?.length() ?: 0)).map { i ->
               val r = arr!!.getJSONObject(i)
-              WidgetRow(r.optString("name"), r.optString("price"), r.optString("change"), r.optString("dir", "neutral"), r.optString("currency", ""))
+              WidgetRow(
+                  r.optString("name"),
+                  r.optString("price"),
+                  r.optString("change"),
+                  r.optString("dir", "neutral"),
+                  r.optString("currency", ""),
+                  r.optBoolean("dim", false),
+                  r.optBoolean("error", false),
+              )
             }
-        WidgetPayload(o.optString("updatedLabel"), rows)
+        WidgetPayload(
+            o.optString("updatedLabel"),
+            rows,
+            if (o.has("staleAt")) o.optLong("staleAt") else null,
+            if (o.has("staleLabel")) o.optString("staleLabel") else null,
+            o.optBoolean("empty", false),
+        )
       } catch (e: Exception) {
         null
       }

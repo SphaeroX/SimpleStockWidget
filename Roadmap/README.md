@@ -27,7 +27,7 @@ Stand: 2026-11-26 – in Arbeit.
 | 07 | Android-Widget: finales Layout | erledigt |
 | 08 | Android: Reload-Button im Widget | erledigt |
 | 09 | Android: einstellbares Auto-Update | erledigt |
-| 10 | Marktstatus und Fehlerzustände | offen |
+| 10 | Marktstatus und Fehlerzustände | erledigt |
 | 11 | iOS: Widget-Grundgerüst | offen |
 | 12 | iOS: Reload-Button und Refresh | offen |
 
@@ -44,7 +44,8 @@ Globale Informationen, Architekturentscheidungen und Wissen, das für das gesamt
 - **Plattform-Reihenfolge (Interview):** Android vollständig zuerst (Tasks 01–10), iOS danach (Tasks 11–12). In der Cloud-Umgebung kann nur Android gebaut werden; iOS braucht später Mac/Xcode oder CI.
 - **Projekt-Setup (Init):** `AGENTS.md` + `docs/` im Root sind angelegt (Riverpod, `shared_preferences`, `http`, `flutter_lints`, `mocktail`). Cloud-Umgebung „SimpleStockWidget“ installiert Flutter 3.50.1 unter `/opt/flutter` und Android-SDK 36 unter `/opt/android-sdk` per Setup-Skript.
 - **Yahoo-Endpunkt (Task_01):** `https://query1.finance.yahoo.com/v8/finance/chart/<SYMBOL>?range=1d&interval=1d` mit Browser-User-Agent, kein Crumb nötig. `v7/finance/quote` ist ohne Crumb gesperrt. Suche: `v1/finance/search?q=...&quotesCount=..&newsCount=0`. Kein `marketState` im Chart → aus `currentTradingPeriod` berechnen.
-- **Widget-Vertrag (Task_01):** ein JSON-String unter Key `ssw_payload` (Modell `lib/widget_sync/widget_payload.dart`, gespiegelt in `android/.../widget/WidgetPayload.kt`).
+- **Widget-Vertrag (Task_01, erweitert bis Task_10):** Keys im home_widget-Speicher: `ssw_payload` (JSON: `updatedAt`, `updatedLabel`, `rows[]` mit `name, price, change, dir, currency?, dim?, error?`, dazu `staleAt?`, `staleLabel?`, `empty?`), `ssw_loading` (Start-Zeitstempel ms oder leer), `ssw_error` (fertiger Fehlertext oder leer), `ssw_last_background_run`. Modell: `lib/widget_sync/widget_payload.dart`, gespiegelt in `android/.../widget/WidgetPayload.kt`. Native Seite rechnet nichts außer `staleAt`-Vergleich und Spaltenaufteilung.
+- **Refresh (Task_03/08/09):** genau ein Ablauf `RefreshService.refresh()`; Aufrufer: App (Riverpod), Reload-Button (`widgetInteractivityCallback`, URI `simplestock://reload`), WorkManager (`workmanagerDispatcher`). Ohne Riverpod: `createDefaultRefreshService()`.
 - **Tests:** verbindlich unter `tests/`, Aufruf `flutter test tests/` (siehe `AGENTS.md`).
 
 ## Auffälligkeiten & Details

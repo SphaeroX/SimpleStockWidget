@@ -62,8 +62,10 @@ class StockGlanceWidget : GlanceAppWidget() {
     provideContent {
       val prefs = currentState<HomeWidgetGlanceState>().preferences
       val payload = WidgetPayload.parse(prefs.getString(WidgetKeys.PAYLOAD, null))
-      val loading = WidgetLayout.isLoading(prefs.getString(WidgetKeys.LOADING, null), System.currentTimeMillis())
-      WidgetContent(payload, onOpen = actionStartActivity<MainActivity>(context), onReload = reloadAction(), loading = loading)
+      val now = System.currentTimeMillis()
+      val loading = WidgetLayout.isLoading(prefs.getString(WidgetKeys.LOADING, null), now)
+      val header = WidgetLayout.headerText(payload, prefs.getString(WidgetKeys.ERROR, null), now, loading)
+      WidgetContent(payload, onOpen = actionStartActivity<MainActivity>(context), onReload = reloadAction(), loading = loading, header = header)
     }
   }
 
@@ -88,12 +90,18 @@ private const val NAME_SP = 13
 private const val ROW_SP = 12
 
 @Composable
-internal fun WidgetContent(payload: WidgetPayload?, onOpen: Action?, onReload: Action?, loading: Boolean = false) {
+internal fun WidgetContent(
+    payload: WidgetPayload?,
+    onOpen: Action?,
+    onReload: Action?,
+    loading: Boolean = false,
+    header: HeaderText = WidgetLayout.headerText(payload, null, 0L, loading),
+) {
   val size = LocalSize.current
   var root = GlanceModifier.fillMaxSize().background(WidgetColors.background).cornerRadius(20.dp).padding(12.dp)
   if (onOpen != null) root = root.clickable(onOpen)
   Column(modifier = root) {
-    Header(payload?.updatedLabel, if (loading) null else onReload, loading)
+    Header(header, if (loading) null else onReload, loading)
     Spacer(GlanceModifier.height(WidgetLayout.HEADER_GAP_DP.dp))
     val rows = payload?.rows.orEmpty()
     if (rows.isEmpty()) {
@@ -118,11 +126,16 @@ internal fun WidgetContent(payload: WidgetPayload?, onOpen: Action?, onReload: A
 }
 
 @Composable
-private fun Header(label: String?, onReload: Action?, loading: Boolean) {
+private fun Header(header: HeaderText, onReload: Action?, loading: Boolean) {
   Row(modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.HEADER_DP.dp), verticalAlignment = Alignment.CenterVertically) {
     Text(
-        if (loading) "Aktualisiere …" else "Letzter Abruf: ${label ?: "–"}",
-        style = TextStyle(color = WidgetColors.secondary, fontSize = 12.sp),
+        header.text,
+        style =
+            TextStyle(
+                color = if (header.warning) WidgetColors.negative else WidgetColors.secondary,
+                fontSize = 12.sp,
+                fontWeight = if (header.warning) FontWeight.Medium else FontWeight.Normal,
+            ),
         maxLines = 1,
         modifier = GlanceModifier.defaultWeight(),
     )
@@ -153,17 +166,18 @@ private fun RowLine(
         else -> WidgetColors.neutral
       }
   val arrow = if (showArrow) arrowFor(row.dir) else ""
+  val textColor = if (row.dim || row.error) WidgetColors.secondary else WidgetColors.text
   Row(modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.ROW_DP.dp), verticalAlignment = Alignment.CenterVertically) {
     Text(
         row.name,
         maxLines = 1,
-        style = TextStyle(color = WidgetColors.text, fontSize = NAME_SP.sp, fontWeight = FontWeight.Medium),
+        style = TextStyle(color = textColor, fontSize = NAME_SP.sp, fontWeight = FontWeight.Medium),
         modifier = GlanceModifier.defaultWeight(),
     )
     Text(
         row.price,
         maxLines = 1,
-        style = TextStyle(color = WidgetColors.text, fontSize = ROW_SP.sp, textAlign = TextAlign.End),
+        style = TextStyle(color = textColor, fontSize = ROW_SP.sp, textAlign = TextAlign.End),
         modifier = GlanceModifier.width(priceWidth),
     )
     Text(
