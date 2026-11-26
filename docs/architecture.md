@@ -4,7 +4,7 @@
 
 ## Tech-Stack
 
-- **Sprache/Runtime:** Dart mit Flutter stable (eingerichtet: Flutter 3.50.1 / Dart 3.14.0). Die genaue SDK-Untergrenze steht nach Task 01 in `pubspec.yaml`.
+- **Sprache/Runtime:** Dart mit Flutter stable (eingerichtet: Flutter 3.50.1 / Dart 3.14.0). SDK-Untergrenze siehe `pubspec.yaml`. UI-Import: `package:material_ui/material_ui.dart` (neue entkoppelte Material-Bibliothek).
 - **Android-Widget:** Kotlin + Jetpack Glance.
 - **iOS-Widget (später):** SwiftUI + WidgetKit, Mindestversion iOS 17 (für interaktive Buttons via AppIntent).
 - **Tragende Pakete:**
@@ -18,6 +18,7 @@
 ## Architektur
 
 - **Dart ist die einzige Logik-Schicht.** Abruf, Währungsumrechnung, Modus-Auswahl und Formatierung passieren in Dart. Das Ergebnis wird als fertig formatierter Payload (Strings + Richtung hoch/runter/neutral + Status-Flags) über `home_widget` gespeichert. Native Widgets rendern nur und rechnen nicht – so bleibt die Logik einmal vorhanden und mit `flutter_test` testbar.
+- **Yahoo-Endpunkt:** `v8/finance/chart/<SYMBOL>?range=1d&interval=1d` (ohne Crumb), Suche `v1/finance/search`.
 - **Datenquelle austauschbar:** Alle Kursdaten laufen über die Schnittstelle `QuoteProvider`. Standard-Implementierung ist Yahoo Finance (inoffiziell, kein API-Key). Yahoo-spezifische Felder verlassen den Provider nie.
 - **Ein Refresh-Ablauf:** Eine zentrale Funktion (Watchlist laden → Kurse + FX holen → formatieren → speichern → Widget aktualisieren) wird von App, Reload-Button (Hintergrund-Callback) und WorkManager gleichermaßen aufgerufen.
 - **Einstellungen:** Anzeigewährung und Anzeigemodus global, pro Watchlist-Eintrag überschreibbar (Override > global > Original).
@@ -30,9 +31,9 @@
 - **Android-SDK:** In der Cloud-Umgebung „SimpleStockWidget“ unter `/opt/android-sdk` (Platform 36, Build-Tools 36.0.0), installiert per Setup-Skript der Umgebung; Java 21 ist vorhanden. `dl.google.com` ist dort freigegeben. Ein Emulator ist nicht verfügbar – visuelle Prüfungen am Gerät macht der Nutzer.
 - **iOS:** Build nur auf macOS mit Xcode oder über macOS-CI.
 
-## Erster Implementierungsschritt
+## Projekt-Erzeugung
 
-Nicht ausgeführt, gehört zu `Roadmap/Tasks/Task_01.md`:
+Ausgeführt in Task 01:
 
 ```bash
 flutter create --org de.sphaerox --project-name simple_stock_widget --platforms android,ios .
@@ -42,7 +43,6 @@ Danach die von `flutter create` erzeugte Datei `test/widget_test.dart` entfernen
 
 ## Offene Entscheidungen
 
-- Exakter Yahoo-Endpunkt und ob Cookie/Crumb nötig ist – Klärung in Task 01.
 - iOS-Hintergrund-Refresh: Dart über `home_widget`-Interaktivität oder nativer Swift-Abruf – Klärung in Task 11.
 
 ---

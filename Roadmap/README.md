@@ -14,11 +14,11 @@ Ein schlankes Homescreen-Widget für Android (zuerst) und iOS (später), das ein
 
 ## Aktueller Status
 
-Stand: 2026-11-26 – Roadmap angelegt, noch kein Task begonnen.
+Stand: 2026-11-26 – in Arbeit.
 
 | Task | Titel | Status |
 |---|---|---|
-| 01 | Durchstich: App → Yahoo → Android-Widget | offen |
+| 01 | Durchstich: App → Yahoo → Android-Widget | erledigt |
 | 02 | Provider-Schnittstelle + Yahoo-Provider | offen |
 | 03 | Watchlist: Suche, Hinzufügen, Entfernen, Sortieren | offen |
 | 04 | Eigene Anzeigenamen | offen |
@@ -43,6 +43,8 @@ Globale Informationen, Architekturentscheidungen und Wissen, das für das gesamt
 - **Einstellungen (Interview):** Anzeigewährung und Anzeigemodus (Prozent / Betrag / beides) global, pro Wert überschreibbar. Update-Intervall 15/30/60 Min einstellbar.
 - **Plattform-Reihenfolge (Interview):** Android vollständig zuerst (Tasks 01–10), iOS danach (Tasks 11–12). In der Cloud-Umgebung kann nur Android gebaut werden; iOS braucht später Mac/Xcode oder CI.
 - **Projekt-Setup (Init):** `AGENTS.md` + `docs/` im Root sind angelegt (Riverpod, `shared_preferences`, `http`, `flutter_lints`, `mocktail`). Cloud-Umgebung „SimpleStockWidget“ installiert Flutter 3.50.1 unter `/opt/flutter` und Android-SDK 36 unter `/opt/android-sdk` per Setup-Skript.
+- **Yahoo-Endpunkt (Task_01):** `https://query1.finance.yahoo.com/v8/finance/chart/<SYMBOL>?range=1d&interval=1d` mit Browser-User-Agent, kein Crumb nötig. `v7/finance/quote` ist ohne Crumb gesperrt. Suche: `v1/finance/search?q=...&quotesCount=..&newsCount=0`. Kein `marketState` im Chart → aus `currentTradingPeriod` berechnen.
+- **Widget-Vertrag (Task_01):** ein JSON-String unter Key `ssw_payload` (Modell `lib/widget_sync/widget_payload.dart`, gespiegelt in `android/.../widget/WidgetPayload.kt`).
 - **Tests:** verbindlich unter `tests/`, Aufruf `flutter test tests/` (siehe `AGENTS.md`).
 
 ## Auffälligkeiten & Details
@@ -52,4 +54,6 @@ Dinge, die global noch zu beachten sind: Besonderheiten, bekannte Einschränkung
 - Yahoo Finance ist eine inoffizielle Schnittstelle (Endpunkte, ggf. Cookie/Crumb, Rate-Limits können sich ändern). Fehler müssen das Widget nie leer machen – letzte Daten bleiben stehen.
 - Android erlaubt periodische Hintergrund-Jobs (WorkManager) frühestens alle 15 Minuten.
 - Zahlenformat deutsch: Tausenderpunkt, Dezimalkomma (`50.182,95`).
+- Erster Gradle-Build lädt viel aus Maven Central; bei HTTP 429 einfach erneut bauen.
+- Glance-Widget visuell nur am echten Gerät prüfbar (kein Emulator in der Cloud).
 - Laufend ergänzen.

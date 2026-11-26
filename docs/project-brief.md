@@ -33,7 +33,6 @@ Ein schlankes Homescreen-Widget, das eine selbst gewählte Liste von Aktien, ETF
 
 ## Offene Entscheidungen
 
-- Yahoo-Endpunkt und Cookie/Crumb-Bedarf.
 - iOS-Hintergrund-Refresh über Dart oder nativen Swift-Abruf.
 - iOS-Build-Umgebung (eigener Mac oder CI).
 
