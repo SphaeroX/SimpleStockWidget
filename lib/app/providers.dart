@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../quotes/providers.dart';
+import '../settings/app_settings.dart';
+import '../settings/settings_repository.dart';
 import '../storage/key_value_store.dart';
 import '../watchlist/watchlist_entry.dart';
 import '../watchlist/watchlist_repository.dart';
@@ -15,13 +17,33 @@ final watchlistRepositoryProvider = Provider<WatchlistRepository>(
   (ref) => WatchlistRepository(ref.watch(keyValueStoreProvider)),
 );
 
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => SettingsRepository(ref.watch(keyValueStoreProvider)),
+);
+
 final refreshServiceProvider = Provider<RefreshService>(
   (ref) => RefreshService(
     quotes: ref.watch(quoteProviderProvider),
     watchlist: ref.watch(watchlistRepositoryProvider),
     widgetStorage: ref.watch(widgetStorageProvider),
+    settings: ref.watch(settingsRepositoryProvider),
   ),
 );
+
+final settingsProvider = AsyncNotifierProvider<SettingsNotifier, AppSettings>(SettingsNotifier.new);
+
+class SettingsNotifier extends AsyncNotifier<AppSettings> {
+  @override
+  Future<AppSettings> build() => ref.read(settingsRepositoryProvider).load();
+
+  Future<void> change(AppSettings Function(AppSettings) change) async {
+    final current = state.value ?? await future;
+    final next = change(current);
+    await ref.read(settingsRepositoryProvider).save(next);
+    state = AsyncData(next);
+    ref.read(refreshServiceProvider).refresh().ignore();
+  }
+}
 
 final watchlistProvider = AsyncNotifierProvider<WatchlistNotifier, List<WatchlistEntry>>(WatchlistNotifier.new);
 

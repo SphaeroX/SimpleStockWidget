@@ -5,6 +5,7 @@ import '../watchlist/watchlist_entry.dart';
 import 'providers.dart';
 import 'entry_detail_page.dart';
 import 'search_page.dart';
+import 'settings_page.dart';
 
 class WatchlistPage extends ConsumerWidget {
   const WatchlistPage({super.key});
@@ -16,6 +17,11 @@ class WatchlistPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Watchlist'),
         actions: [
+          IconButton(
+            tooltip: 'Einstellungen',
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SettingsPage())),
+          ),
           IconButton(
             tooltip: 'Widget aktualisieren',
             icon: const Icon(Icons.refresh),

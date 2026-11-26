@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:simple_stock_widget/currency/currency.dart';
 import 'package:simple_stock_widget/quotes/quote.dart';
+import 'package:simple_stock_widget/settings/app_settings.dart';
+import 'package:simple_stock_widget/settings/settings_repository.dart';
 import 'package:simple_stock_widget/watchlist/watchlist_entry.dart';
 import 'package:simple_stock_widget/watchlist/watchlist_repository.dart';
 import 'package:simple_stock_widget/widget_sync/refresh_service.dart';
@@ -26,6 +29,37 @@ void main() {
     ).refresh();
     final json = jsonDecode(widget.data[WidgetKeys.payload]!) as Map<String, dynamic>;
     expect((json['rows'] as List).single['name'], 'msci world');
+  });
+
+  test('Währung: global EUR, Override Original, FX nur für benötigte Paare', () async {
+    final store = InMemoryStore();
+    await SettingsRepository(store).save(const AppSettings(displayCurrency: 'EUR'));
+    final repo = WatchlistRepository(store);
+    await repo.save([
+      const WatchlistEntry(symbol: 'NVDA', name: 'NVIDIA', type: QuoteType.equity),
+      const WatchlistEntry(symbol: 'TSLA', name: 'Tesla', type: QuoteType.equity).copyWith(currency: originalCurrency),
+      const WatchlistEntry(symbol: 'EVK.DE', name: 'Evonik', type: QuoteType.equity),
+    ]);
+    final widget = InMemoryWidgetStorage();
+    final quotes = FakeQuoteProvider({
+      'NVDA': const Quote(symbol: 'NVDA', price: 100, previousClose: 110, currency: 'USD'),
+      'TSLA': const Quote(symbol: 'TSLA', price: 380.14, previousClose: 384.68, currency: 'USD'),
+      'EVK.DE': const Quote(symbol: 'EVK.DE', price: 18.51, previousClose: 18.45, currency: 'EUR'),
+      'USDEUR=X': const Quote(symbol: 'USDEUR=X', price: 0.9, previousClose: 0.9, currency: 'EUR'),
+    });
+    await RefreshService(
+      quotes: quotes,
+      watchlist: repo,
+      widgetStorage: widget,
+      settings: SettingsRepository(store),
+    ).refresh();
+    expect(quotes.fetchCalls.last, ['USDEUR=X']);
+    final rows = ((jsonDecode(widget.data[WidgetKeys.payload]!) as Map)['rows'] as List).cast<Map>();
+    expect(rows[0]['price'], '90,00');
+    expect(rows[0]['currency'], '€');
+    expect(rows[1]['price'], '380,14');
+    expect(rows[1]['currency'], r'$');
+    expect(rows[2]['price'], '18,51');
   });
 
   test('Payload enthält Einträge in Watchlist-Reihenfolge', () async {

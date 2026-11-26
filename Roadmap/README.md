@@ -22,7 +22,7 @@ Stand: 2026-11-26 – in Arbeit.
 | 02 | Provider-Schnittstelle + Yahoo-Provider | erledigt |
 | 03 | Watchlist: Suche, Hinzufügen, Entfernen, Sortieren | erledigt |
 | 04 | Eigene Anzeigenamen | erledigt |
-| 05 | Währungsumrechnung | offen |
+| 05 | Währungsumrechnung | erledigt |
 | 06 | Anzeigemodus %, Betrag oder beides | offen |
 | 07 | Android-Widget: finales Layout | offen |
 | 08 | Android: Reload-Button im Widget | offen |

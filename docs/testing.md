@@ -46,7 +46,7 @@ Eine Aufgabe ist fertig, wenn mechanisch prüfbar gilt:
 - Bei fehlschlagendem Test wird die Implementierung korrigiert, nicht der Test.
 - Höchstens 3 Reparaturversuche pro fehlschlagendem Test; danach anhalten und berichten.
 - Muss ein bestehender Test geändert werden: Grund nennen und Freigabe abwarten.
-- Tests machen nie echte Netzwerkaufrufe. Optionale Live-Tests gegen Yahoo liegen unter `tests/integration/`, tragen `@Tags(['live'])` und werden mit `flutter test tests/ --exclude-tags live` aus dem Standardlauf herausgehalten (sobald es sie gibt, wird der Standardbefehl hier entsprechend angepasst).
+- Tests machen nie echte Netzwerkaufrufe. Ausnahme: Live-Tests gegen Yahoo unter `tests/integration/` mit `@Tags(['live'])`; `dart_test.yaml` überspringt sie im Standardlauf. Manuell: `flutter test tests/integration --run-skipped --tags live` (benötigt freigegebene Yahoo-Hosts).
 
 ## Teststruktur
 
