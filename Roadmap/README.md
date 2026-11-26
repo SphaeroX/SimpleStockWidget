@@ -14,7 +14,7 @@ Ein schlankes Homescreen-Widget für Android (zuerst) und iOS (später), das ein
 
 ## Aktueller Status
 
-Stand: 2026-11-26 – in Arbeit.
+Stand: 2026-11-26 – Android fertig (Tasks 01–10). iOS (Tasks 11–12) pausiert auf Wunsch des Nutzers, bis Android am Gerät getestet ist und eine iOS-Build-Umgebung (Mac oder macOS-CI) feststeht.
 
 | Task | Titel | Status |
 |---|---|---|
