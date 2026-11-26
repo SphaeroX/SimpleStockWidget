@@ -77,12 +77,10 @@ class RefreshService {
     }
 
     final now = _clock();
+    final sorted = sortEntries([for (final e in entries) (e, batch.quotes[e.symbol])], settings.sortOrder);
     final rows = [
-      for (final e in entries)
-        if (batch.quotes[e.symbol] case final q?)
-          buildRow(e, q, settings, rates)
-        else
-          WidgetRow.failed(e.effectiveName),
+      for (final (e, quote) in sorted)
+        if (quote case final q?) buildRow(e, q, settings, rates) else WidgetRow.failed(e.effectiveName),
     ];
     final label = formatUpdatedLabel(now);
     final payload = WidgetPayload(

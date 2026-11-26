@@ -21,7 +21,7 @@
 - **Yahoo-Endpunkt:** `v8/finance/chart/<SYMBOL>?range=1d&interval=1d` (ohne Crumb), Suche `v1/finance/search`.
 - **Datenquelle austauschbar:** Alle Kursdaten laufen über die Schnittstelle `QuoteProvider`. Standard-Implementierung ist Yahoo Finance (inoffiziell, kein API-Key). Yahoo-spezifische Felder verlassen den Provider nie.
 - **Ein Refresh-Ablauf:** Eine zentrale Funktion (Watchlist laden → Kurse + FX holen → formatieren → speichern → Widget aktualisieren) wird von App, Reload-Button (Hintergrund-Callback) und WorkManager gleichermaßen aufgerufen.
-- **Einstellungen:** Anzeigewährung und Anzeigemodus global, pro Watchlist-Eintrag überschreibbar (Override > global > Original).
+- **Einstellungen:** Anzeigewährung und Anzeigemodus global, pro Watchlist-Eintrag überschreibbar (Override > global > Original). Sortierung im Widget (`SortOrder`) nur global; sortiert wird in Dart (`sortEntries` in `lib/widget_sync/payload_builder.dart`) vor dem Formatieren, Gewinner/Verlierer nach Prozent, Einträge ohne Kurs ans Ende.
 - **Fehlerverhalten:** Ein fehlgeschlagener Abruf überschreibt nie die letzten gültigen Daten; das Widget zeigt dann einen Hinweis.
 
 ## Umgebung

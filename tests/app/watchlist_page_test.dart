@@ -5,6 +5,8 @@ import 'package:simple_stock_widget/app/providers.dart';
 import 'package:simple_stock_widget/app/watchlist_page.dart';
 import 'package:simple_stock_widget/quotes/providers.dart';
 import 'package:simple_stock_widget/quotes/quote.dart';
+import 'package:simple_stock_widget/settings/app_settings.dart';
+import 'package:simple_stock_widget/settings/settings_repository.dart';
 import 'package:simple_stock_widget/watchlist/watchlist_entry.dart';
 import 'package:simple_stock_widget/watchlist/watchlist_repository.dart';
 
@@ -53,5 +55,16 @@ void main() {
     tester.widget<ReorderableListView>(find.byType(ReorderableListView)).onReorderItem!(0, 2);
     await tester.pumpAndSettle();
     expect((await WatchlistRepository(store).load()).map((e) => e.symbol), ['TSLA', 'BTC-EUR', 'NVDA']);
+  });
+
+  testWidgets('Sortierung über das Menü wählen, Hinweis bei nicht-manueller Sortierung', (tester) async {
+    await pump(tester);
+    expect(find.textContaining('Widget sortiert'), findsNothing);
+    await tester.tap(find.byTooltip('Sortierung im Widget'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Gewinner zuerst').last);
+    await tester.pumpAndSettle();
+    expect((await SettingsRepository(store).load()).sortOrder, SortOrder.gainersFirst);
+    expect(find.textContaining('Widget sortiert: Gewinner zuerst'), findsOneWidget);
   });
 }

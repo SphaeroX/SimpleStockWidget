@@ -13,6 +13,7 @@ Ein schlankes Homescreen-Widget, das eine selbst gewählte Liste von Aktien, ETF
 - Anzeigewährung global wählbar, pro Wert überschreibbar (inkl. Originalwährung).
 - Anzeige der Tagesveränderung als Prozent, Betrag oder beides – global, pro Wert überschreibbar.
 - Widget mit Header „Letzter Abruf: HH:MM Wochentag“, Reload-Button oben rechts, zweispaltiger, größenabhängiger Liste, Hell/Dunkel nach System.
+- Sortierung im Widget wählbar: manuell (Watchlist-Reihenfolge), Name A–Z, Gewinner zuerst, Verlierer zuerst (nach Prozent).
 - Automatisches Update im einstellbaren Intervall (15/30/60 Min).
 - Hinweis bei geschlossener Börse, veralteten Daten und Fehlern; letzte Daten bleiben sichtbar.
 

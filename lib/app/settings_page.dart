@@ -43,6 +43,19 @@ class SettingsPage extends ConsumerWidget {
               onSelectionChanged: (v) => notifier.change((x) => x.copyWith(changeMode: v.single)),
             ),
             const SizedBox(height: 24),
+            DropdownMenu<SortOrder>(
+              key: const Key('sort-order'),
+              label: const Text('Sortierung im Widget'),
+              expandedInsets: EdgeInsets.zero,
+              initialSelection: s.sortOrder,
+              onSelected: (v) => v == null ? null : notifier.change((x) => x.copyWith(sortOrder: v)),
+              dropdownMenuEntries: [
+                for (final o in SortOrder.values) DropdownMenuEntry(value: o, label: sortOrderLabel(o)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text('Gewinner/Verlierer richtet sich nach der prozentualen Tagesveränderung.'),
+            const SizedBox(height: 24),
             Text('Automatisch aktualisieren alle', style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             SegmentedButton<UpdateInterval>(

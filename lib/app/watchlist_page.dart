@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../settings/app_settings.dart';
 import '../watchlist/watchlist_entry.dart';
 import 'providers.dart';
 import 'entry_detail_page.dart';
@@ -13,10 +14,21 @@ class WatchlistPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final watchlist = ref.watch(watchlistProvider);
+    final sortOrder = ref.watch(settingsProvider).value?.sortOrder ?? SortOrder.manual;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Watchlist'),
         actions: [
+          PopupMenuButton<SortOrder>(
+            tooltip: 'Sortierung im Widget',
+            icon: const Icon(Icons.sort),
+            initialValue: sortOrder,
+            onSelected: (o) => ref.read(settingsProvider.notifier).change((s) => s.copyWith(sortOrder: o)),
+            itemBuilder: (_) => [
+              for (final o in SortOrder.values)
+                CheckedPopupMenuItem(value: o, checked: o == sortOrder, child: Text(sortOrderLabel(o))),
+            ],
+          ),
           IconButton(
             tooltip: 'Einstellungen',
             icon: const Icon(Icons.settings),
@@ -29,16 +41,31 @@ class WatchlistPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: watchlist.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: $e')),
-        data: (entries) => entries.isEmpty
-            ? const Center(child: Text('Noch keine Werte. Tippe auf + zum Hinzufügen.'))
-            : ReorderableListView.builder(
-                itemCount: entries.length,
-                onReorderItem: (o, n) => ref.read(watchlistProvider.notifier).reorder(o, n > o ? n + 1 : n),
-                itemBuilder: (context, i) => _EntryTile(key: ValueKey(entries[i].symbol), entry: entries[i]),
+      body: Column(
+        children: [
+          if (sortOrder != SortOrder.manual)
+            Container(
+              width: double.infinity,
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'Widget sortiert: ${sortOrderLabel(sortOrder)} – die Reihenfolge hier gilt nur bei „Manuell“.',
               ),
+            ),
+          Expanded(
+            child: watchlist.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Fehler: $e')),
+              data: (entries) => entries.isEmpty
+                  ? const Center(child: Text('Noch keine Werte. Tippe auf + zum Hinzufügen.'))
+                  : ReorderableListView.builder(
+                      itemCount: entries.length,
+                      onReorderItem: (o, n) => ref.read(watchlistProvider.notifier).reorder(o, n > o ? n + 1 : n),
+                      itemBuilder: (context, i) => _EntryTile(key: ValueKey(entries[i].symbol), entry: entries[i]),
+                    ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Wert hinzufügen',
