@@ -42,6 +42,7 @@ Globale Informationen, Architekturentscheidungen und Wissen, das für das gesamt
 - **Datenquelle (Interview):** Austauschbar hinter einer `QuoteProvider`-Schnittstelle; Standard-Implementierung Yahoo Finance (inoffiziell, kein API-Key). Symbole im Yahoo-Format (`NVDA`, `EVK.DE`, `IWDA.L`, `^GDAXI`, `BTC-EUR`).
 - **Einstellungen (Interview):** Anzeigewährung und Anzeigemodus (Prozent / Betrag / beides) global, pro Wert überschreibbar. Update-Intervall 15/30/60 Min einstellbar.
 - **Plattform-Reihenfolge (Interview):** Android vollständig zuerst (Tasks 01–10), iOS danach (Tasks 11–12). In der Cloud-Umgebung kann nur Android gebaut werden; iOS braucht später Mac/Xcode oder CI.
+- **Projekt-Setup (Init):** `AGENTS.md` + `docs/` im Root sind angelegt (Riverpod, `shared_preferences`, `http`, `flutter_lints`, `mocktail`). Cloud-Umgebung „SimpleStockWidget“ installiert Flutter 3.50.1 unter `/opt/flutter` und Android-SDK 36 unter `/opt/android-sdk` per Setup-Skript.
 - **Tests:** verbindlich unter `tests/`, Aufruf `flutter test tests/` (siehe `AGENTS.md`).
 
 ## Auffälligkeiten & Details
