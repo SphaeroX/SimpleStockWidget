@@ -6,6 +6,7 @@ import '../settings/settings_repository.dart';
 import '../storage/key_value_store.dart';
 import '../watchlist/watchlist_entry.dart';
 import '../watchlist/watchlist_repository.dart';
+import '../widget_sync/background.dart';
 import '../widget_sync/refresh_service.dart';
 import '../widget_sync/widget_storage.dart';
 
@@ -30,6 +31,9 @@ final refreshServiceProvider = Provider<RefreshService>(
   ),
 );
 
+/// Plant das Auto-Update neu; in Tests durch einen No-op ersetzbar.
+final scheduleUpdatesProvider = Provider<Future<void> Function()>((ref) => applyUpdateSchedule);
+
 final settingsProvider = AsyncNotifierProvider<SettingsNotifier, AppSettings>(SettingsNotifier.new);
 
 class SettingsNotifier extends AsyncNotifier<AppSettings> {
@@ -42,6 +46,7 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
     await ref.read(settingsRepositoryProvider).save(next);
     state = AsyncData(next);
     ref.read(refreshServiceProvider).refresh().ignore();
+    if (next.updateInterval != current.updateInterval) ref.read(scheduleUpdatesProvider)().ignore();
   }
 }
 

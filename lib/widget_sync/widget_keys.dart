@@ -4,4 +4,7 @@ abstract final class WidgetKeys {
 
   /// Zeitstempel (ms) eines laufenden Refreshs, leer wenn keiner läuft.
   static const loading = 'ssw_loading';
+
+  /// Zeitstempel (ms) der letzten WorkManager-Ausführung (Debugging).
+  static const lastBackgroundRun = 'ssw_last_background_run';
 }

@@ -35,4 +35,13 @@ void main() {
     expect(s.displayCurrency, 'EUR');
     expect(s.changeMode, ChangeMode.percent);
   });
+
+  test('Update-Intervall: Standard 30 Min, Persistenz', () async {
+    final store = InMemoryStore();
+    expect((await SettingsRepository(store).load()).updateInterval, UpdateInterval.min30);
+    await SettingsRepository(store).save(const AppSettings(updateInterval: UpdateInterval.min15));
+    final loaded = await SettingsRepository(store).load();
+    expect(loaded.updateInterval, UpdateInterval.min15);
+    expect(loaded.updateInterval.duration, const Duration(minutes: 15));
+  });
 }

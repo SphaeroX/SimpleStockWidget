@@ -7,6 +7,8 @@ object WidgetKeys {
   const val PAYLOAD = "ssw_payload"
   const val LOADING = "ssw_loading"
   const val RELOAD_URI = "simplestock://reload"
+  const val SCHEDULE_URI = "simplestock://schedule"
+  const val PERIODIC_WORK = "ssw_periodic_refresh"
 }
 
 data class WidgetRow(val name: String, val price: String, val change: String, val dir: String, val currency: String = "")

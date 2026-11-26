@@ -26,7 +26,7 @@ Stand: 2026-11-26 – in Arbeit.
 | 06 | Anzeigemodus %, Betrag oder beides | erledigt |
 | 07 | Android-Widget: finales Layout | erledigt |
 | 08 | Android: Reload-Button im Widget | erledigt |
-| 09 | Android: einstellbares Auto-Update | offen |
+| 09 | Android: einstellbares Auto-Update | erledigt |
 | 10 | Marktstatus und Fehlerzustände | offen |
 | 11 | iOS: Widget-Grundgerüst | offen |
 | 12 | iOS: Reload-Button und Refresh | offen |

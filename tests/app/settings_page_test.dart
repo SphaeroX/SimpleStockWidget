@@ -19,12 +19,14 @@ void main() {
   testWidgets('Moduswechsel speichert die Einstellung und aktualisiert das Widget', (tester) async {
     final store = InMemoryStore();
     final widget = InMemoryWidgetStorage();
+    var scheduled = 0;
     await WatchlistRepository(store).save(const [WatchlistEntry(symbol: 'NVDA', name: 'NVIDIA')]);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           keyValueStoreProvider.overrideWithValue(store),
           widgetStorageProvider.overrideWithValue(widget),
+          scheduleUpdatesProvider.overrideWithValue(() async => scheduled++),
           quoteProviderProvider.overrideWithValue(
             FakeQuoteProvider({
               'NVDA': const Quote(symbol: 'NVDA', price: 149.3, previousClose: 155.38, currency: 'USD'),
@@ -41,5 +43,11 @@ void main() {
     expect((await SettingsRepository(store).load()).changeMode, ChangeMode.both);
     final rows = (jsonDecode(widget.data[WidgetKeys.payload]!) as Map)['rows'] as List;
     expect(rows.single['change'], '-6,08 (-3,91 %)');
+    expect(scheduled, 0);
+
+    await tester.tap(find.text('15 Min'));
+    await tester.pumpAndSettle();
+    expect((await SettingsRepository(store).load()).updateInterval, UpdateInterval.min15);
+    expect(scheduled, 1);
   });
 }
