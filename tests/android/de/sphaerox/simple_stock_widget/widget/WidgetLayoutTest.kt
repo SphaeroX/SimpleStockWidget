@@ -75,3 +75,13 @@ class TextWidthTest {
     assertEquals(true, rest >= 50f)
   }
 }
+
+class LoadingTest {
+  @Test
+  fun ladezustand() {
+    assertEquals(false, WidgetLayout.isLoading(null, 100_000L))
+    assertEquals(false, WidgetLayout.isLoading("", 100_000L))
+    assertEquals(true, WidgetLayout.isLoading("90000", 100_000L))
+    assertEquals(false, WidgetLayout.isLoading("10000", 100_000L))
+  }
+}

@@ -5,6 +5,8 @@ import org.json.JSONObject
 /** Spiegel von lib/widget_sync/widget_keys.dart. */
 object WidgetKeys {
   const val PAYLOAD = "ssw_payload"
+  const val LOADING = "ssw_loading"
+  const val RELOAD_URI = "simplestock://reload"
 }
 
 data class WidgetRow(val name: String, val price: String, val change: String, val dir: String, val currency: String = "")

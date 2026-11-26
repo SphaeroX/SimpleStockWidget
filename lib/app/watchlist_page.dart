@@ -52,7 +52,13 @@ class WatchlistPage extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     try {
       final payload = await ref.read(refreshServiceProvider).refresh();
-      messenger.showSnackBar(SnackBar(content: Text('Widget aktualisiert (${payload.updatedLabel})')));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            payload == null ? 'Aktualisierung läuft bereits' : 'Widget aktualisiert (${payload.updatedLabel})',
+          ),
+        ),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Aktualisierung fehlgeschlagen: $e')));
     }

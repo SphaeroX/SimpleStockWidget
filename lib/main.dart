@@ -1,9 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:home_widget/home_widget.dart';
+
 import 'app/watchlist_page.dart';
+import 'widget_sync/background.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  HomeWidget.registerInteractivityCallback(widgetInteractivityCallback);
   runApp(const ProviderScope(child: SimpleStockApp()));
 }
 

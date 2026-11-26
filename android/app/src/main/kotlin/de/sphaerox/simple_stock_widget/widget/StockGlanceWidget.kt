@@ -15,6 +15,7 @@ import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -59,8 +60,10 @@ class StockGlanceWidget : GlanceAppWidget() {
 
   override suspend fun provideGlance(context: Context, id: GlanceId) {
     provideContent {
-      val payload = WidgetPayload.parse(currentState<HomeWidgetGlanceState>().preferences.getString(WidgetKeys.PAYLOAD, null))
-      WidgetContent(payload, onOpen = actionStartActivity<MainActivity>(context), onReload = reloadAction(context))
+      val prefs = currentState<HomeWidgetGlanceState>().preferences
+      val payload = WidgetPayload.parse(prefs.getString(WidgetKeys.PAYLOAD, null))
+      val loading = WidgetLayout.isLoading(prefs.getString(WidgetKeys.LOADING, null), System.currentTimeMillis())
+      WidgetContent(payload, onOpen = actionStartActivity<MainActivity>(context), onReload = reloadAction(), loading = loading)
     }
   }
 
@@ -72,8 +75,7 @@ class StockGlanceWidget : GlanceAppWidget() {
   }
 }
 
-/** Platzhalter bis Task 08: Reload öffnet die App. */
-internal fun reloadAction(context: Context): Action = actionStartActivity<MainActivity>(context)
+internal fun reloadAction(): Action = actionRunCallback<ReloadAction>()
 
 internal fun arrowFor(dir: String) =
     when (dir) {
@@ -86,12 +88,12 @@ private const val NAME_SP = 13
 private const val ROW_SP = 12
 
 @Composable
-internal fun WidgetContent(payload: WidgetPayload?, onOpen: Action?, onReload: Action?) {
+internal fun WidgetContent(payload: WidgetPayload?, onOpen: Action?, onReload: Action?, loading: Boolean = false) {
   val size = LocalSize.current
   var root = GlanceModifier.fillMaxSize().background(WidgetColors.background).cornerRadius(20.dp).padding(12.dp)
   if (onOpen != null) root = root.clickable(onOpen)
   Column(modifier = root) {
-    Header(payload?.updatedLabel, onReload)
+    Header(payload?.updatedLabel, if (loading) null else onReload, loading)
     Spacer(GlanceModifier.height(WidgetLayout.HEADER_GAP_DP.dp))
     val rows = payload?.rows.orEmpty()
     if (rows.isEmpty()) {
@@ -116,10 +118,10 @@ internal fun WidgetContent(payload: WidgetPayload?, onOpen: Action?, onReload: A
 }
 
 @Composable
-private fun Header(label: String?, onReload: Action?) {
+private fun Header(label: String?, onReload: Action?, loading: Boolean) {
   Row(modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.HEADER_DP.dp), verticalAlignment = Alignment.CenterVertically) {
     Text(
-        "Letzter Abruf: ${label ?: "–"}",
+        if (loading) "Aktualisiere …" else "Letzter Abruf: ${label ?: "–"}",
         style = TextStyle(color = WidgetColors.secondary, fontSize = 12.sp),
         maxLines = 1,
         modifier = GlanceModifier.defaultWeight(),
@@ -130,7 +132,7 @@ private fun Header(label: String?, onReload: Action?) {
       Image(
           provider = ImageProvider(R.drawable.ic_widget_refresh),
           contentDescription = "Aktualisieren",
-          colorFilter = ColorFilter.tint(WidgetColors.secondary),
+          colorFilter = ColorFilter.tint(if (loading) WidgetColors.divider else WidgetColors.secondary),
           modifier = GlanceModifier.size(20.dp),
       )
     }

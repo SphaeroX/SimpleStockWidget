@@ -41,4 +41,10 @@ object WidgetLayout {
             }
         em
       }.toFloat() * sp
+
+  /** Läuft gerade ein Refresh? [loadingValue] ist der Zeitstempel (ms) aus WidgetKeys.LOADING. */
+  fun isLoading(loadingValue: String?, nowMs: Long, staleAfterMs: Long = 60_000L): Boolean {
+    val started = loadingValue?.toLongOrNull() ?: return false
+    return nowMs - started in 0 until staleAfterMs
+  }
 }

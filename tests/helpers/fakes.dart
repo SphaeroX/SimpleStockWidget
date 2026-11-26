@@ -14,10 +14,15 @@ class InMemoryStore implements KeyValueStore {
 class InMemoryWidgetStorage implements WidgetStorage {
   final Map<String, String> data = {};
   int updates = 0;
+  void Function(String key, String value)? onSave;
   @override
   Future<String?> readString(String key) async => data[key];
   @override
-  Future<void> saveString(String key, String value) async => data[key] = value;
+  Future<void> saveString(String key, String value) async {
+    data[key] = value;
+    onSave?.call(key, value);
+  }
+
   @override
   Future<void> updateWidget() async => updates++;
 }
