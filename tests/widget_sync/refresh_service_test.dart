@@ -62,6 +62,29 @@ void main() {
     expect(rows[2]['price'], '18,51');
   });
 
+  test('Anzeigemodus: global Prozent, Override beides', () async {
+    final store = InMemoryStore();
+    final repo = WatchlistRepository(store);
+    await repo.save([
+      const WatchlistEntry(symbol: 'NVDA', name: 'NVIDIA', type: QuoteType.equity),
+      const WatchlistEntry(symbol: 'TSLA', name: 'Tesla', type: QuoteType.equity).copyWith(changeMode: ChangeMode.both),
+    ]);
+    final widget = InMemoryWidgetStorage();
+    await RefreshService(
+      quotes: FakeQuoteProvider({
+        'NVDA': const Quote(symbol: 'NVDA', price: 149.3, previousClose: 155.38, currency: 'USD'),
+        'TSLA': const Quote(symbol: 'TSLA', price: 101, previousClose: 100, currency: 'USD'),
+      }),
+      watchlist: repo,
+      widgetStorage: widget,
+      settings: SettingsRepository(store),
+    ).refresh();
+    final rows = ((jsonDecode(widget.data[WidgetKeys.payload]!) as Map)['rows'] as List).cast<Map>();
+    expect(rows[0]['change'], '-3,91 %');
+    expect(rows[1]['change'], '+1,00 (+1,00 %)');
+    expect(rows[1]['dir'], 'up');
+  });
+
   test('Payload enthält Einträge in Watchlist-Reihenfolge', () async {
     final store = InMemoryStore();
     final repo = WatchlistRepository(store);

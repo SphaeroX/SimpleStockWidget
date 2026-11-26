@@ -21,4 +21,18 @@ void main() {
     final store = InMemoryStore()..data[SettingsRepository.storageKey] = 'x';
     expect((await SettingsRepository(store).load()).displayCurrency, originalCurrency);
   });
+
+  test('Anzeigemodus: Standard Prozent, Persistenz', () async {
+    final store = InMemoryStore();
+    expect((await SettingsRepository(store).load()).changeMode, ChangeMode.percent);
+    await SettingsRepository(store).save(const AppSettings(changeMode: ChangeMode.both));
+    expect((await SettingsRepository(store).load()).changeMode, ChangeMode.both);
+  });
+
+  test('alte Einstellungen ohne changeMode werden geladen', () async {
+    final store = InMemoryStore()..data[SettingsRepository.storageKey] = '{"displayCurrency":"EUR"}';
+    final s = await SettingsRepository(store).load();
+    expect(s.displayCurrency, 'EUR');
+    expect(s.changeMode, ChangeMode.percent);
+  });
 }

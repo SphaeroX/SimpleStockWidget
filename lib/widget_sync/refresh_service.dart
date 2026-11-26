@@ -1,11 +1,11 @@
 import 'package:intl/intl.dart';
 
 import '../currency/currency.dart';
-import '../format/quote_format.dart';
 import '../quotes/quote_provider.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_repository.dart';
 import '../watchlist/watchlist_repository.dart';
+import 'payload_builder.dart';
 import 'widget_payload.dart';
 import 'widget_storage.dart';
 import 'widget_sync.dart';
@@ -32,10 +32,9 @@ class RefreshService {
     final settings = await _settings?.load() ?? const AppSettings();
     final batch = await _quotes.fetchQuotes([for (final e in entries) e.symbol]);
 
-    String targetOf(e) => effectiveTargetCurrency(override: e.currency, global: settings.displayCurrency);
     final pairs = <(String, String)>{
       for (final e in entries)
-        if (batch.quotes[e.symbol] case final q?) (normalizedCurrencyCode(q.currency), targetOf(e)),
+        if (batch.quotes[e.symbol] case final q?) (normalizedCurrencyCode(q.currency), targetCurrencyOf(e, settings)),
     };
     final fxSymbols = fxSymbolsFor(pairs).toList()..sort();
     final rates = <String, double>{};
@@ -45,21 +44,10 @@ class RefreshService {
     }
 
     final now = _clock();
-    final rows = <WidgetRow>[];
-    for (final e in entries) {
-      final q = batch.quotes[e.symbol];
-      if (q == null) continue;
-      final c = convertQuote(q, target: targetOf(e), rates: rates);
-      rows.add(
-        WidgetRow(
-          name: e.effectiveName,
-          price: formatPrice(c.price),
-          change: formatSigned(c.change),
-          currency: currencySymbol(c.currency),
-          direction: c.change > 0 ? Direction.up : (c.change < 0 ? Direction.down : Direction.neutral),
-        ),
-      );
-    }
+    final rows = [
+      for (final e in entries)
+        if (batch.quotes[e.symbol] case final q?) buildRow(e, q, settings, rates),
+    ];
     final payload = WidgetPayload(updatedAt: now, updatedLabel: DateFormat('HH:mm').format(now), rows: rows);
     await _sync.publish(payload);
     return payload;

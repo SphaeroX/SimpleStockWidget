@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../currency/currency.dart';
+import '../settings/app_settings.dart';
 import '../watchlist/watchlist_entry.dart';
 import 'providers.dart';
 
@@ -62,7 +63,8 @@ class _EntryDetailPageState extends ConsumerState<EntryDetailPage> {
 
   /// Platz für Einstellungen weiterer Tasks (Währung, Anzeigemodus).
   List<Widget> _extraSettings() {
-    final global = ref.watch(settingsProvider).value?.displayCurrency ?? originalCurrency;
+    final settings = ref.watch(settingsProvider).value ?? const AppSettings();
+    final global = settings.displayCurrency;
     return [
       const SizedBox(height: 16),
       DropdownMenu<String>(
@@ -75,6 +77,19 @@ class _EntryDetailPageState extends ConsumerState<EntryDetailPage> {
           DropdownMenuEntry(value: _inherit, label: 'Wie global (${currencyLabel(global)})'),
           for (final c in [originalCurrency, ...selectableCurrencies])
             DropdownMenuEntry(value: c, label: currencyLabel(c)),
+        ],
+      ),
+      const SizedBox(height: 16),
+      DropdownMenu<String>(
+        key: const Key('entry-change-mode'),
+        label: const Text('Tagesveränderung'),
+        expandedInsets: EdgeInsets.zero,
+        initialSelection: _draft.changeMode?.name ?? _inherit,
+        onSelected: (v) =>
+            setState(() => _draft = _draft.copyWith(changeMode: v == _inherit ? null : ChangeMode.values.byName(v!))),
+        dropdownMenuEntries: [
+          DropdownMenuEntry(value: _inherit, label: 'Wie global (${changeModeLabel(settings.changeMode)})'),
+          for (final m in ChangeMode.values) DropdownMenuEntry(value: m.name, label: changeModeLabel(m)),
         ],
       ),
     ];

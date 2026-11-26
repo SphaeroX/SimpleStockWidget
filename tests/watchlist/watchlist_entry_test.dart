@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:simple_stock_widget/quotes/quote.dart';
+import 'package:simple_stock_widget/settings/app_settings.dart';
 import 'package:simple_stock_widget/watchlist/watchlist_entry.dart';
 
 const base = WatchlistEntry(symbol: 'IWDA.L', name: 'iShares Core MSCI World', type: QuoteType.etf);
@@ -33,5 +34,12 @@ void main() {
   test('JSON-Rundreise erhält displayName', () {
     final e = WatchlistEntry.fromJson(base.withDisplayName('msci world').toJson());
     expect(e.displayName, 'msci world');
+  });
+
+  test('Modus-Override: JSON-Rundreise und Zurücksetzen', () {
+    final e = WatchlistEntry.fromJson(base.copyWith(changeMode: ChangeMode.amount).toJson());
+    expect(e.changeMode, ChangeMode.amount);
+    expect(e.copyWith(changeMode: null).changeMode, isNull);
+    expect(e.withDisplayName('x').changeMode, ChangeMode.amount);
   });
 }

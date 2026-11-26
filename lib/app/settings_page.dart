@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../currency/currency.dart';
+import '../settings/app_settings.dart';
 import 'providers.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -32,9 +33,24 @@ class SettingsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             const Text('Kurs und Betragsveränderung werden mit dem aktuellen Wechselkurs umgerechnet.'),
+            const SizedBox(height: 24),
+            Text('Tagesveränderung anzeigen als', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            SegmentedButton<ChangeMode>(
+              key: const Key('global-change-mode'),
+              segments: [for (final m in ChangeMode.values) ButtonSegment(value: m, label: Text(_short(m)))],
+              selected: {s.changeMode},
+              onSelectionChanged: (v) => notifier.change((x) => x.copyWith(changeMode: v.single)),
+            ),
           ],
         ),
       ),
     );
   }
+
+  static String _short(ChangeMode m) => switch (m) {
+    ChangeMode.percent => '%',
+    ChangeMode.amount => 'Betrag',
+    ChangeMode.both => 'Beides',
+  };
 }
