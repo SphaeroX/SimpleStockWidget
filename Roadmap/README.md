@@ -24,7 +24,7 @@ Stand: 2026-11-26 – in Arbeit.
 | 04 | Eigene Anzeigenamen | erledigt |
 | 05 | Währungsumrechnung | erledigt |
 | 06 | Anzeigemodus %, Betrag oder beides | erledigt |
-| 07 | Android-Widget: finales Layout | offen |
+| 07 | Android-Widget: finales Layout | erledigt |
 | 08 | Android: Reload-Button im Widget | offen |
 | 09 | Android: einstellbares Auto-Update | offen |
 | 10 | Marktstatus und Fehlerzustände | offen |

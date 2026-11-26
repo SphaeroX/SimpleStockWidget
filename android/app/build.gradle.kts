@@ -30,6 +30,10 @@ android {
         versionName = flutter.versionName
     }
 
+    sourceSets {
+        getByName("test").java.srcDirs("../../tests/android")
+    }
+
     buildFeatures {
         compose = true
     }
@@ -56,4 +60,5 @@ flutter {
 dependencies {
     implementation("androidx.glance:glance-appwidget:1.2.0")
     implementation("androidx.glance:glance-material3:1.2.0")
+    testImplementation("junit:junit:4.13.2")
 }

@@ -20,6 +20,7 @@ export PATH=/opt/flutter/bin:$PATH        # nur Cloud-Umgebung
 flutter pub get                            # Abhängigkeiten installieren
 flutter test tests/                        # alle Tests
 flutter test tests/<pfad>_test.dart        # einzelne Testdatei
+(cd android && ./gradlew :app:testDebugUnitTest)   # Kotlin-Tests (Widget-Logik)
 flutter analyze                            # Lint
 dart format lib tests                      # Format
 flutter build apk --debug                  # Android-Build (benötigt Android-SDK)

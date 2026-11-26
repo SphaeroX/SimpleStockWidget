@@ -1,6 +1,5 @@
-import 'package:intl/intl.dart';
-
 import '../currency/currency.dart';
+import '../format/time_format.dart';
 import '../quotes/quote_provider.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_repository.dart';
@@ -48,7 +47,7 @@ class RefreshService {
       for (final e in entries)
         if (batch.quotes[e.symbol] case final q?) buildRow(e, q, settings, rates),
     ];
-    final payload = WidgetPayload(updatedAt: now, updatedLabel: DateFormat('HH:mm').format(now), rows: rows);
+    final payload = WidgetPayload(updatedAt: now, updatedLabel: formatUpdatedLabel(now), rows: rows);
     await _sync.publish(payload);
     return payload;
   }

@@ -110,6 +110,7 @@ void main() {
     expect(rows.map((r) => r['name']), ['TSLA', 'NVDA']);
     expect(rows.last['price'], '149,30');
     expect(rows.last['dir'], 'down');
+    expect(json['updatedLabel'], '22:48 Mi.');
     expect(widget.updates, 1);
   });
 }
