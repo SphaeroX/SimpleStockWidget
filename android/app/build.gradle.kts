@@ -38,11 +38,22 @@ android {
         compose = true
     }
 
+    // Release-Signierung über Umgebungsvariablen (CI-Secrets); ohne sie wird mit dem Debug-Schlüssel signiert.
+    val releaseKeystore = System.getenv("SSW_KEYSTORE_PATH")?.let { file(it) }?.takeIf { it.exists() }
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = System.getenv("SSW_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("SSW_KEY_ALIAS")
+                keyPassword = System.getenv("SSW_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (releaseKeystore != null) "release" else "debug")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

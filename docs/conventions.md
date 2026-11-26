@@ -26,6 +26,8 @@
 
 ## Git
 
+- Release: `version` in `pubspec.yaml` erhöhen (`x.y.z+build`, Build-Nummer immer hochzählen), committen, Tag `vX.Y.Z` pushen → CI baut und veröffentlicht das GitHub-Release.
+
 - Commit-Nachrichten: Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`, `refactor:`).
 - Arbeit an Roadmap-Tasks: ein oder mehrere Commits pro Task, Task-Nummer im Text (z. B. `feat: yahoo quote provider (Task_02)`).
 

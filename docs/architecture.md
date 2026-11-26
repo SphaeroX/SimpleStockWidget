@@ -30,6 +30,8 @@
 - Paketverwaltung ausschließlich mit `flutter pub` (`flutter pub add <paket>`), keine manuellen Versionsänderungen ohne `flutter pub get`.
 - **Android-SDK:** In der Cloud-Umgebung „SimpleStockWidget“ unter `/opt/android-sdk` (Platform 36, Build-Tools 36.0.0), installiert per Setup-Skript der Umgebung; Java 21 ist vorhanden. `dl.google.com` ist dort freigegeben. Ein Emulator ist nicht verfügbar – visuelle Prüfungen am Gerät macht der Nutzer.
 - **iOS:** Build nur auf macOS mit Xcode oder über macOS-CI.
+- **CI/Release (GitHub Actions, `.github/workflows/android.yml`):** Bei Push auf `main`, Pull Requests und Tags `v*`: Format, Analyse, Dart- und Kotlin-Tests, Release-APKs (arm64, armv7, universal) als Artefakt. Bei Tag `v*` zusätzlich GitHub-Release mit den APKs.
+- **Signierung:** `android/app/build.gradle.kts` nutzt einen Release-Schlüssel, wenn `SSW_KEYSTORE_PATH` (+ `SSW_KEYSTORE_PASSWORD`, `SSW_KEY_ALIAS`, `SSW_KEY_PASSWORD`) gesetzt ist; in CI aus den Secrets `SSW_KEYSTORE_BASE64`, `SSW_KEYSTORE_PASSWORD`, `SSW_KEY_ALIAS`, `SSW_KEY_PASSWORD`. Ohne sie: Debug-Schlüssel (jeder CI-Lauf anders → Updates über alte Versionen schlagen fehl).
 
 ## Projekt-Erzeugung
 
