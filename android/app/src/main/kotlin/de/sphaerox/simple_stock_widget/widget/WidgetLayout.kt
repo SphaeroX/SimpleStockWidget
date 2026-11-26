@@ -61,4 +61,8 @@ object WidgetLayout {
     }
     return HeaderText("Letzter Abruf: ${payload?.updatedLabel?.ifEmpty { null } ?: "–"}", false)
   }
+
+  /** Deep-Link in die Chart-Ansicht (Gegenstück: lib/app/deep_link.dart); `null` ohne Symbol. */
+  fun chartUri(symbol: String): String? =
+      if (symbol.isEmpty()) null else "simplestock://chart?symbol=" + java.net.URLEncoder.encode(symbol, "UTF-8")
 }

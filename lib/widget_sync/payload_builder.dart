@@ -16,6 +16,7 @@ WidgetRow buildRow(WatchlistEntry e, Quote q, AppSettings settings, Map<String, 
       ? directionOf(c.changePercent)
       : directionOf(c.change, reference: c.price);
   return WidgetRow(
+    symbol: e.symbol,
     name: e.effectiveName,
     price: formatPrice(c.price),
     change: formatChange(mode, change: c.change, percent: c.changePercent, reference: c.price),

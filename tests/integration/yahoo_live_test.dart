@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:simple_stock_widget/chart/chart_range.dart';
 import 'package:simple_stock_widget/quotes/yahoo/yahoo_quote_provider.dart';
 
 void main() {
@@ -17,5 +18,14 @@ void main() {
   test('echte Suche', () async {
     final results = await YahooQuoteProvider(http.Client()).search('nvidia');
     expect(results.map((r) => r.symbol), contains('NVDA'));
+  });
+
+  test('echter Verlauf für alle Zeiträume', () async {
+    final p = YahooQuoteProvider(http.Client());
+    for (final range in ChartRange.values) {
+      final r = HistoryRequest.forRange(range, now: DateTime.now());
+      final h = await p.fetchHistory('^GDAXI', from: r.fetchFrom, to: r.to, interval: r.interval);
+      expect(h.points.length, greaterThan(20), reason: range.name);
+    }
   });
 }

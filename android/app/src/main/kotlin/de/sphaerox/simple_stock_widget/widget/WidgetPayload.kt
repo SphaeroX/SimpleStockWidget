@@ -20,6 +20,7 @@ data class WidgetRow(
     val currency: String = "",
     val dim: Boolean = false,
     val error: Boolean = false,
+    val symbol: String = "",
 )
 
 data class WidgetPayload(
@@ -56,6 +57,7 @@ data class WidgetPayload(
                   r.optString("currency", ""),
                   r.optBoolean("dim", false),
                   r.optBoolean("error", false),
+                  r.optString("symbol", ""),
               )
             }
         WidgetPayload(

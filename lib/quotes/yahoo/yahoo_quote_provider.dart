@@ -3,12 +3,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../chart/price_history.dart';
 import '../quote.dart';
 import '../quote_provider.dart';
 import 'yahoo_chart_parser.dart';
 
 /// [QuoteProvider] auf Basis der inoffiziellen Yahoo-Finance-Chart-API.
-class YahooQuoteProvider implements QuoteProvider {
+class YahooQuoteProvider implements QuoteProvider, PriceHistoryProvider {
   YahooQuoteProvider(this._client, {this.timeout = const Duration(seconds: 10), DateTime Function()? clock})
     : _clock = clock ?? DateTime.now;
 
@@ -81,6 +82,38 @@ class YahooQuoteProvider implements QuoteProvider {
       ];
     } catch (e) {
       throw ParseQuoteException(e.toString());
+    }
+  }
+
+  @override
+  Future<PriceHistory> fetchHistory(
+    String symbol, {
+    required DateTime? from,
+    required DateTime to,
+    required HistoryInterval interval,
+  }) async {
+    int sec(DateTime t) => t.millisecondsSinceEpoch ~/ 1000;
+    final uri = Uri.https(yahooHost, '/v8/finance/chart/$symbol', {
+      if (from == null) 'range': 'max' else ...{'period1': '${sec(from)}', 'period2': '${sec(to)}'},
+      'interval': interval.yahooCode,
+    });
+    final http.Response res;
+    try {
+      res = await _client.get(uri, headers: yahooHeaders).timeout(timeout * 2);
+    } on TimeoutException {
+      throw NetworkQuoteException('Timeout beim Verlauf von $symbol');
+    } on http.ClientException catch (e) {
+      throw NetworkQuoteException(e.message);
+    }
+    switch (res.statusCode) {
+      case 200:
+        return parseYahooHistory(res.body);
+      case 404:
+        throw UnknownSymbolException(symbol);
+      case 429:
+        throw RateLimitException(symbol);
+      default:
+        throw NetworkQuoteException('HTTP ${res.statusCode} beim Verlauf von $symbol');
     }
   }
 }

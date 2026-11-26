@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:simple_stock_widget/app/chart_page.dart';
 import 'package:simple_stock_widget/app/providers.dart';
 import 'package:simple_stock_widget/app/watchlist_page.dart';
 import 'package:simple_stock_widget/quotes/providers.dart';
@@ -23,6 +24,7 @@ void main() {
           keyValueStoreProvider.overrideWithValue(store),
           widgetStorageProvider.overrideWithValue(widget),
           quoteProviderProvider.overrideWithValue(FakeQuoteProvider(const {})),
+          priceHistoryProviderProvider.overrideWithValue(EmptyHistoryProvider()),
         ],
         child: const MaterialApp(home: WatchlistPage()),
       ),
@@ -66,5 +68,14 @@ void main() {
     await tester.pumpAndSettle();
     expect((await SettingsRepository(store).load()).sortOrder, SortOrder.gainersFirst);
     expect(find.textContaining('Widget sortiert: Gewinner zuerst'), findsOneWidget);
+  });
+
+  testWidgets('Antippen eines Eintrags öffnet den Chart', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('Tesla'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byType(ChartPage), findsOneWidget);
+    expect(tester.widget<ChartPage>(find.byType(ChartPage)).entry.symbol, 'TSLA');
   });
 }

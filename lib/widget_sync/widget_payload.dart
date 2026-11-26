@@ -9,6 +9,7 @@ class WidgetRow {
     this.currency = '',
     this.dim = false,
     this.error = false,
+    this.symbol = '',
   });
 
   /// Zeile für einen Wert, dessen Kurs nicht geladen werden konnte.
@@ -18,7 +19,8 @@ class WidgetRow {
       direction = Direction.neutral,
       currency = '',
       dim = false,
-      error = true;
+      error = true,
+      symbol = '';
 
   final String name;
   final String price;
@@ -34,6 +36,9 @@ class WidgetRow {
   /// Kurs konnte nicht geladen werden.
   final bool error;
 
+  /// Symbol für den Chart-Link beim Antippen; leer = kein Chart (z. B. fehlgeschlagene Zeile).
+  final String symbol;
+
   Map<String, dynamic> toJson() => {
     'name': name,
     'price': price,
@@ -42,6 +47,7 @@ class WidgetRow {
     if (currency.isNotEmpty) 'currency': currency,
     if (dim) 'dim': true,
     if (error) 'error': true,
+    if (symbol.isNotEmpty) 'symbol': symbol,
   };
 }
 

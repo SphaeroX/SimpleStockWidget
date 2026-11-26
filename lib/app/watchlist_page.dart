@@ -4,7 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import '../settings/app_settings.dart';
 import '../watchlist/watchlist_entry.dart';
 import 'providers.dart';
-import 'entry_detail_page.dart';
+import 'chart_page.dart';
 import 'search_page.dart';
 import 'settings_page.dart';
 
@@ -112,7 +112,7 @@ class _EntryTile extends ConsumerWidget {
         title: Text(entry.displayName ?? entry.name),
         subtitle: Text(entry.displayName == null ? entry.symbol : '${entry.symbol} · ${entry.name}'),
         trailing: const Icon(Icons.drag_handle),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EntryDetailPage(entry: entry))),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ChartPage(entry: entry))),
       ),
     );
   }

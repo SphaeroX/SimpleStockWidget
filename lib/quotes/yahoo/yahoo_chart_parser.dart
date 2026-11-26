@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../chart/price_history.dart';
+import '../../currency/currency.dart';
 import '../quote.dart';
 import '../quote_provider.dart';
 
@@ -82,5 +84,35 @@ Future<Quote> fetchYahooChartQuote(http.Client client, String symbol, {DateTime?
       throw RateLimitException(symbol);
     default:
       throw NetworkQuoteException('HTTP ${res.statusCode} für $symbol');
+  }
+}
+
+/// Parst den Kursverlauf (`timestamp` + `indicators.quote[0].close`); Lücken werden übersprungen,
+/// Unterwährungen (GBp …) in die Hauptwährung umgerechnet.
+PriceHistory parseYahooHistory(String body) {
+  try {
+    final json = jsonDecode(body) as Map<String, dynamic>;
+    final results = (json['chart'] as Map<String, dynamic>)['result'] as List?;
+    if (results == null || results.isEmpty) throw const YahooParseException('Kein Ergebnis');
+    final r = results.first as Map<String, dynamic>;
+    final meta = r['meta'] as Map<String, dynamic>;
+    final rawCurrency = meta['currency'] as String;
+    final factor = normalizedCurrencyCode(rawCurrency) == rawCurrency ? 1.0 : 0.01;
+    final times = (r['timestamp'] as List?) ?? const [];
+    final closes = ((r['indicators'] as Map<String, dynamic>)['quote'] as List).first['close'] as List? ?? const [];
+    final points = <PricePoint>[
+      for (var i = 0; i < times.length && i < closes.length; i++)
+        if (closes[i] case final num c)
+          PricePoint(DateTime.fromMillisecondsSinceEpoch((times[i] as num).toInt() * 1000, isUtc: true), c * factor),
+    ];
+    return PriceHistory(
+      symbol: meta['symbol'] as String,
+      currency: normalizedCurrencyCode(rawCurrency),
+      points: points,
+    );
+  } on YahooParseException {
+    rethrow;
+  } catch (e) {
+    throw YahooParseException(e.toString());
   }
 }

@@ -10,7 +10,7 @@ Ein schlankes Homescreen-Widget für Android (zuerst) und iOS (später), das ein
 
 **Zielgruppe:** Nur der Projektinhaber selbst (private Nutzung, Sideload). Keine Store-Veröffentlichung.
 
-**Nicht-Ziele:** Store-Veröffentlichung, Charts/Kursverläufe, Portfolio/Stückzahlen, Kursalarme, Konten/Cloud-Sync, mehrere Widget-Instanzen mit unterschiedlichen Listen.
+**Nicht-Ziele:** Store-Veröffentlichung, Portfolio/Stückzahlen, Kursalarme, Konten/Cloud-Sync, mehrere Widget-Instanzen mit unterschiedlichen Listen.
 
 ## Aktueller Status
 
@@ -47,6 +47,7 @@ Globale Informationen, Architekturentscheidungen und Wissen, das für das gesamt
 - **Widget-Vertrag (Task_01, erweitert bis Task_10):** Keys im home_widget-Speicher: `ssw_payload` (JSON: `updatedAt`, `updatedLabel`, `rows[]` mit `name, price, change, dir, currency?, dim?, error?`, dazu `staleAt?`, `staleLabel?`, `empty?`), `ssw_loading` (Start-Zeitstempel ms oder leer), `ssw_error` (fertiger Fehlertext oder leer), `ssw_last_background_run`. Modell: `lib/widget_sync/widget_payload.dart`, gespiegelt in `android/.../widget/WidgetPayload.kt`. Native Seite rechnet nichts außer `staleAt`-Vergleich und Spaltenaufteilung.
 - **Refresh (Task_03/08/09):** genau ein Ablauf `RefreshService.refresh()`; Aufrufer: App (Riverpod), Reload-Button (`widgetInteractivityCallback`, URI `simplestock://reload`), WorkManager (`workmanagerDispatcher`). Ohne Riverpod: `createDefaultRefreshService()`.
 - **Sortierung (nach Task_10, auf Nutzerwunsch):** `AppSettings.sortOrder` (manual/nameAsc/gainersFirst/losersFirst), wählbar in Einstellungen und per Sortier-Menü in der Watchlist; wirkt auf die Widget-Zeilen. Die App-Liste bleibt die manuelle Reihenfolge (Hinweisbanner, wenn nicht manuell). iOS muss nichts sortieren – die Reihenfolge kommt fertig im Payload.
+- **Chart-Ansicht (nach Task_10, auf Nutzerwunsch):** Antippen in App oder Widget öffnet `ChartPage`; Widget-Zeilen tragen dafür `symbol` im Payload (fehlgeschlagene Zeilen nicht). iOS-Widget muss dieselben Links `simplestock://chart?symbol=…` öffnen (Task 11/12). Details: `docs/architecture.md`.
 - **Tests:** verbindlich unter `tests/`, Aufruf `flutter test tests/` (siehe `AGENTS.md`).
 
 ## Auffälligkeiten & Details

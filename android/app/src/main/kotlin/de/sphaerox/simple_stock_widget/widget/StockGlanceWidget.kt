@@ -1,6 +1,7 @@
 package de.sphaerox.simple_stock_widget.widget
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -65,7 +66,14 @@ class StockGlanceWidget : GlanceAppWidget() {
       val now = System.currentTimeMillis()
       val loading = WidgetLayout.isLoading(prefs.getString(WidgetKeys.LOADING, null), now)
       val header = WidgetLayout.headerText(payload, prefs.getString(WidgetKeys.ERROR, null), now, loading)
-      WidgetContent(payload, onOpen = actionStartActivity<MainActivity>(context), onReload = reloadAction(), loading = loading, header = header)
+      WidgetContent(
+          payload,
+          onOpen = actionStartActivity<MainActivity>(context),
+          onReload = reloadAction(),
+          loading = loading,
+          header = header,
+          onRow = { row -> WidgetLayout.chartUri(row.symbol)?.let { actionStartActivity<MainActivity>(context, Uri.parse(it)) } },
+      )
     }
   }
 
@@ -96,6 +104,7 @@ internal fun WidgetContent(
     onReload: Action?,
     loading: Boolean = false,
     header: HeaderText = WidgetLayout.headerText(payload, null, 0L, loading),
+    onRow: (WidgetRow) -> Action? = { null },
 ) {
   val size = LocalSize.current
   var root = GlanceModifier.fillMaxSize().background(WidgetColors.background).cornerRadius(20.dp).padding(12.dp)
@@ -118,7 +127,7 @@ internal fun WidgetContent(
       split.forEachIndexed { index, column ->
         if (index > 0) Spacer(GlanceModifier.width(WidgetLayout.COLUMN_GAP_DP.dp))
         Column(modifier = GlanceModifier.defaultWeight().fillMaxHeight()) {
-          column.forEach { RowLine(it, priceWidth, changeWidth, showArrows) }
+          column.forEach { RowLine(it, priceWidth, changeWidth, showArrows, onRow(it)) }
         }
       }
     }
@@ -158,6 +167,7 @@ private fun RowLine(
     priceWidth: androidx.compose.ui.unit.Dp,
     changeWidth: androidx.compose.ui.unit.Dp,
     showArrow: Boolean,
+    onClick: Action?,
 ) {
   val color =
       when (row.dir) {
@@ -167,7 +177,9 @@ private fun RowLine(
       }
   val arrow = if (showArrow) arrowFor(row.dir) else ""
   val textColor = if (row.dim || row.error) WidgetColors.secondary else WidgetColors.text
-  Row(modifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.ROW_DP.dp), verticalAlignment = Alignment.CenterVertically) {
+  var rowModifier = GlanceModifier.fillMaxWidth().height(WidgetLayout.ROW_DP.dp)
+  if (onClick != null) rowModifier = rowModifier.clickable(onClick)
+  Row(modifier = rowModifier, verticalAlignment = Alignment.CenterVertically) {
     Text(
         row.name,
         maxLines = 1,

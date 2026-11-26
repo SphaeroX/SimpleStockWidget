@@ -1,3 +1,4 @@
+import '../chart/chart_settings.dart';
 import '../currency/currency.dart';
 
 /// Darstellung der Tagesveränderung.
@@ -38,6 +39,7 @@ class AppSettings {
     this.changeMode = ChangeMode.percent,
     this.updateInterval = UpdateInterval.min30,
     this.sortOrder = SortOrder.manual,
+    this.chart = const ChartSettings(),
   });
 
   /// Globale Anzeigewährung (ISO-Code) oder [originalCurrency].
@@ -52,16 +54,21 @@ class AppSettings {
   /// Sortierung der Werte im Widget; `manual` = Reihenfolge der Watchlist.
   final SortOrder sortOrder;
 
+  /// Zeitraum und Werkzeuge der Chart-Ansicht.
+  final ChartSettings chart;
+
   AppSettings copyWith({
     String? displayCurrency,
     ChangeMode? changeMode,
     UpdateInterval? updateInterval,
     SortOrder? sortOrder,
+    ChartSettings? chart,
   }) => AppSettings(
     displayCurrency: displayCurrency ?? this.displayCurrency,
     changeMode: changeMode ?? this.changeMode,
     updateInterval: updateInterval ?? this.updateInterval,
     sortOrder: sortOrder ?? this.sortOrder,
+    chart: chart ?? this.chart,
   );
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -69,6 +76,9 @@ class AppSettings {
     changeMode: ChangeMode.values.asNameMap()[json['changeMode']] ?? ChangeMode.percent,
     updateInterval: UpdateInterval.values.asNameMap()[json['updateInterval']] ?? UpdateInterval.min30,
     sortOrder: SortOrder.values.asNameMap()[json['sortOrder']] ?? SortOrder.manual,
+    chart: json['chart'] is Map<String, dynamic>
+        ? ChartSettings.fromJson(json['chart'] as Map<String, dynamic>)
+        : const ChartSettings(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -76,5 +86,6 @@ class AppSettings {
     'changeMode': changeMode.name,
     'updateInterval': updateInterval.name,
     'sortOrder': sortOrder.name,
+    'chart': chart.toJson(),
   };
 }

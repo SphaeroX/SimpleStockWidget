@@ -14,6 +14,7 @@
   - `shared_preferences` – Persistenz von Watchlist und Einstellungen als JSON. Reicht für ~20 Einträge, kein Schema-Aufwand.
   - `workmanager` – periodisches Hintergrund-Update auf Android.
   - `intl` – deutsche Zahlen- und Datumsformatierung.
+  - `fl_chart` – Linien-Charts der Chart-Ansicht (reines Dart, keine Plattform-Abhängigkeit, unterstützt Lücken, Bänder und Marker).
 
 ## Architektur
 
@@ -22,6 +23,7 @@
 - **Datenquelle austauschbar:** Alle Kursdaten laufen über die Schnittstelle `QuoteProvider`. Standard-Implementierung ist Yahoo Finance (inoffiziell, kein API-Key). Yahoo-spezifische Felder verlassen den Provider nie.
 - **Ein Refresh-Ablauf:** Eine zentrale Funktion (Watchlist laden → Kurse + FX holen → formatieren → speichern → Widget aktualisieren) wird von App, Reload-Button (Hintergrund-Callback) und WorkManager gleichermaßen aufgerufen.
 - **Einstellungen:** Anzeigewährung und Anzeigemodus global, pro Watchlist-Eintrag überschreibbar (Override > global > Original). Sortierung im Widget (`SortOrder`) nur global; sortiert wird in Dart (`sortEntries` in `lib/widget_sync/payload_builder.dart`) vor dem Formatieren, Gewinner/Verlierer nach Prozent, Einträge ohne Kurs ans Ende.
+- **Chart-Ansicht:** Antippen eines Werts (App-Liste oder Widget-Zeile über Deep-Link `simplestock://chart?symbol=…`) öffnet `lib/app/chart_page.dart`. Verlauf über `PriceHistoryProvider` (Yahoo `v8/finance/chart` mit `period1/period2` bzw. `range=max`, Intervalle 1h/1d/1wk). `HistoryRequest` lädt mit Vorlauf (Stunden 45 Tage, Tage 300 Tage, Wochen 1500 Tage), damit MA200 & Co. am linken Rand gültig sind. Indikatoren (`lib/chart/indicators.dart`: SMA, EMA, Bollinger, RSI nach Wilder, Kreuzungen) und Zuschnitt (`ChartData`) sind reines Dart. Zeitraum/Werkzeuge in `AppSettings.chart`. Kurse im Chart in Originalwährung (Pence → Pfund normalisiert).
 - **Fehlerverhalten:** Ein fehlgeschlagener Abruf überschreibt nie die letzten gültigen Daten; das Widget zeigt dann einen Hinweis.
 
 ## Umgebung

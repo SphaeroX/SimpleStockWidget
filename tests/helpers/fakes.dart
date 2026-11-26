@@ -1,3 +1,4 @@
+import 'package:simple_stock_widget/chart/price_history.dart';
 import 'package:simple_stock_widget/quotes/quote.dart';
 import 'package:simple_stock_widget/quotes/quote_provider.dart';
 import 'package:simple_stock_widget/storage/key_value_store.dart';
@@ -51,4 +52,14 @@ class FakeQuoteProvider implements QuoteProvider {
 
   @override
   Future<List<SymbolSearchResult>> search(String query) async => searchResults;
+}
+
+class EmptyHistoryProvider implements PriceHistoryProvider {
+  @override
+  Future<PriceHistory> fetchHistory(
+    String symbol, {
+    required DateTime? from,
+    required DateTime to,
+    required HistoryInterval interval,
+  }) async => PriceHistory(symbol: symbol, currency: 'USD', points: const []);
 }

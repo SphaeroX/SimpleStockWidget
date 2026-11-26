@@ -125,3 +125,18 @@ class HeaderTextTest {
     assertEquals(true, parsed.rows[0].error)
   }
 }
+
+class ChartLinkTest {
+  @Test
+  fun chartLinkKodiertSymbol() {
+    assertEquals("simplestock://chart?symbol=%5EGDAXI", WidgetLayout.chartUri("^GDAXI"))
+    assertEquals("simplestock://chart?symbol=EURUSD%3DX", WidgetLayout.chartUri("EURUSD=X"))
+    assertEquals(null, WidgetLayout.chartUri(""))
+  }
+
+  @Test
+  fun payloadEnthaeltSymbol() {
+    val p = WidgetPayload.parse("""{"updatedLabel":"x","rows":[{"name":"msci world","symbol":"IWDA.L","price":"1","change":"2","dir":"up"}]}""")!!
+    assertEquals("IWDA.L", p.rows[0].symbol)
+  }
+}

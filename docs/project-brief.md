@@ -14,13 +14,14 @@ Ein schlankes Homescreen-Widget, das eine selbst gewählte Liste von Aktien, ETF
 - Anzeige der Tagesveränderung als Prozent, Betrag oder beides – global, pro Wert überschreibbar.
 - Widget mit Header „Letzter Abruf: HH:MM Wochentag“, Reload-Button oben rechts, zweispaltiger, größenabhängiger Liste, Hell/Dunkel nach System.
 - Sortierung im Widget wählbar: manuell (Watchlist-Reihenfolge), Name A–Z, Gewinner zuerst, Verlierer zuerst (nach Prozent).
+- Chart-Ansicht beim Antippen (App oder Widget): Zeitraum 7/30/90 Tage, 1 Jahr, Max oder eigener; einblendbar MA20/50/200, EMA20, Bollinger, Golden/Death Cross (MA20/50 oder MA50/200), RSI 14.
 - Automatisches Update im einstellbaren Intervall (15/30/60 Min).
 - Hinweis bei geschlossener Börse, veralteten Daten und Fehlern; letzte Daten bleiben sichtbar.
 
 ## Nicht-Ziele
 
 - Store-Veröffentlichung (Play Store / App Store).
-- Charts und Kursverläufe, Portfolio/Stückzahlen, Kursalarme.
+- Portfolio/Stückzahlen, Kursalarme.
 - Benutzerkonten, Cloud-Sync.
 - Mehrere Widget-Instanzen mit unterschiedlichen Listen.
 
