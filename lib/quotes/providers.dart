@@ -5,6 +5,4 @@ import 'quote_provider.dart';
 import 'yahoo/yahoo_quote_provider.dart';
 
 /// Zentrale Stelle für die Wahl der Kursquelle. In Tests per `overrideWithValue` ersetzbar.
-final quoteProviderProvider = Provider<QuoteProvider>(
-  (ref) => YahooQuoteProvider(http.Client()),
-);
+final quoteProviderProvider = Provider<QuoteProvider>((ref) => YahooQuoteProvider(http.Client()));

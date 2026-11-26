@@ -19,14 +19,12 @@ class HomeWidgetStorage implements WidgetStorage {
   }
 
   @override
-  Future<String?> readString(String key) =>
-      HomeWidget.getWidgetData<String>(key);
+  Future<String?> readString(String key) => HomeWidget.getWidgetData<String>(key);
 
   @override
   Future<void> updateWidget() async {
     await HomeWidget.updateWidget(
-      qualifiedAndroidName:
-          'de.sphaerox.simple_stock_widget.widget.$androidWidgetName',
+      qualifiedAndroidName: 'de.sphaerox.simple_stock_widget.widget.$androidWidgetName',
       iOSName: iOSWidgetName,
     );
   }

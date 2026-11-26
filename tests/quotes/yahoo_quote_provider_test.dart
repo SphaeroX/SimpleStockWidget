@@ -20,24 +20,21 @@ const fixtures = {
 };
 
 // NVDA-Fixture: pre 1795597200–1795617000, regular 1795617000–1795640400, post bis 1795654800.
-DateTime at(int epochSec) =>
-    DateTime.fromMillisecondsSinceEpoch(epochSec * 1000, isUtc: true);
+DateTime at(int epochSec) => DateTime.fromMillisecondsSinceEpoch(epochSec * 1000, isUtc: true);
 
 MockClient fixtureClient() => MockClient((req) async {
   final symbol = Uri.decodeComponent(req.url.pathSegments.last);
   final f = fixtures[symbol];
-  if (f == null)
+  if (f == null) {
     return http.Response(fixture('yahoo_chart_xxxxinvalid.json'), 404);
+  }
   return http.Response(fixture(f), 200);
 });
 
 void main() {
   group('Mapping aller Symboltypen', () {
     test('Typ, Währung, Kurs und Vortagesschluss', () async {
-      final provider = YahooQuoteProvider(
-        fixtureClient(),
-        clock: () => at(1795620000),
-      );
+      final provider = YahooQuoteProvider(fixtureClient(), clock: () => at(1795620000));
       final batch = await provider.fetchQuotes(fixtures.keys.toList());
       expect(batch.errors, isEmpty);
       expect(batch.quotes['NVDA']!.type, QuoteType.equity);
@@ -60,63 +57,36 @@ void main() {
     test('vorbörslich', () => expect(stateAt(1795600000), MarketState.pre));
     test('nachbörslich', () => expect(stateAt(1795645000), MarketState.post));
     test('geschlossen', () => expect(stateAt(1795660000), MarketState.closed));
-    test(
-      'Krypto ist immer offen',
-      () => expect(
-        stateAt(1795660000, 'yahoo_chart_btc_eur.json'),
-        MarketState.open,
-      ),
-    );
+    test('Krypto ist immer offen', () => expect(stateAt(1795660000, 'yahoo_chart_btc_eur.json'), MarketState.open));
     test('ohne Handelszeiten unbekannt', () {
       const body =
           '{"chart":{"result":[{"meta":{"symbol":"X","currency":"EUR","instrumentType":"EQUITY",'
           '"regularMarketPrice":1,"chartPreviousClose":1}}],"error":null}}';
-      expect(
-        parseYahooChart(body, now: at(0)).marketState,
-        MarketState.unknown,
-      );
+      expect(parseYahooChart(body, now: at(0)).marketState, MarketState.unknown);
     });
   });
 
   group('Fehler', () {
     test('ungültiges Symbol verhindert die anderen Ergebnisse nicht', () async {
-      final provider = YahooQuoteProvider(
-        fixtureClient(),
-        clock: () => at(1795620000),
-      );
+      final provider = YahooQuoteProvider(fixtureClient(), clock: () => at(1795620000));
       final batch = await provider.fetchQuotes(['NVDA', 'XXXXINVALID']);
       expect(batch.quotes.keys, ['NVDA']);
       expect(batch.errors['XXXXINVALID'], isA<UnknownSymbolException>());
     });
 
     test('HTTP 429 → RateLimitException', () async {
-      final p = YahooQuoteProvider(
-        MockClient((_) async => http.Response('Too Many Requests', 429)),
-      );
-      expect(
-        (await p.fetchQuotes(['NVDA'])).errors['NVDA'],
-        isA<RateLimitException>(),
-      );
+      final p = YahooQuoteProvider(MockClient((_) async => http.Response('Too Many Requests', 429)));
+      expect((await p.fetchQuotes(['NVDA'])).errors['NVDA'], isA<RateLimitException>());
     });
 
     test('HTTP 500 → NetworkQuoteException', () async {
-      final p = YahooQuoteProvider(
-        MockClient((_) async => http.Response('oops', 500)),
-      );
-      expect(
-        (await p.fetchQuotes(['NVDA'])).errors['NVDA'],
-        isA<NetworkQuoteException>(),
-      );
+      final p = YahooQuoteProvider(MockClient((_) async => http.Response('oops', 500)));
+      expect((await p.fetchQuotes(['NVDA'])).errors['NVDA'], isA<NetworkQuoteException>());
     });
 
     test('ClientException → NetworkQuoteException', () async {
-      final p = YahooQuoteProvider(
-        MockClient((_) async => throw http.ClientException('offline')),
-      );
-      expect(
-        (await p.fetchQuotes(['NVDA'])).errors['NVDA'],
-        isA<NetworkQuoteException>(),
-      );
+      final p = YahooQuoteProvider(MockClient((_) async => throw http.ClientException('offline')));
+      expect((await p.fetchQuotes(['NVDA'])).errors['NVDA'], isA<NetworkQuoteException>());
     });
 
     test('Timeout → NetworkQuoteException', () async {
@@ -124,31 +94,18 @@ void main() {
         MockClient((_) => Completer<http.Response>().future),
         timeout: const Duration(milliseconds: 10),
       );
-      expect(
-        (await p.fetchQuotes(['NVDA'])).errors['NVDA'],
-        isA<NetworkQuoteException>(),
-      );
+      expect((await p.fetchQuotes(['NVDA'])).errors['NVDA'], isA<NetworkQuoteException>());
     });
 
     test('kaputtes JSON → ParseQuoteException', () async {
-      final p = YahooQuoteProvider(
-        MockClient((_) async => http.Response('{kaputt', 200)),
-      );
-      expect(
-        (await p.fetchQuotes(['NVDA'])).errors['NVDA'],
-        isA<ParseQuoteException>(),
-      );
+      final p = YahooQuoteProvider(MockClient((_) async => http.Response('{kaputt', 200)));
+      expect((await p.fetchQuotes(['NVDA'])).errors['NVDA'], isA<ParseQuoteException>());
     });
   });
 
   test('Austauschbarkeit: Fake-Provider erfüllt die Schnittstelle', () async {
     final QuoteProvider p = FakeQuoteProvider({
-      'A': const Quote(
-        symbol: 'A',
-        price: 2,
-        previousClose: 1,
-        currency: 'EUR',
-      ),
+      'A': const Quote(symbol: 'A', price: 2, previousClose: 1, currency: 'EUR'),
     });
     expect((await p.fetchQuotes(['A'])).quotes['A']!.change, 1);
   });

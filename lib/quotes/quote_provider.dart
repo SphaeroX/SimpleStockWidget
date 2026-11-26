@@ -17,12 +17,7 @@ class QuoteBatch {
 }
 
 class SymbolSearchResult {
-  const SymbolSearchResult({
-    required this.symbol,
-    required this.name,
-    required this.type,
-    this.exchange,
-  });
+  const SymbolSearchResult({required this.symbol, required this.name, required this.type, this.exchange});
   final String symbol;
   final String name;
   final QuoteType type;

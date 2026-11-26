@@ -18,17 +18,11 @@ void main() {
     });
 
     test('wirft YahooParseException bei kaputtem JSON', () {
-      expect(
-        () => parseYahooChart('{kaputt'),
-        throwsA(isA<YahooParseException>()),
-      );
+      expect(() => parseYahooChart('{kaputt'), throwsA(isA<YahooParseException>()));
     });
 
     test('wirft YahooParseException bei leerem Ergebnis', () {
-      expect(
-        () => parseYahooChart('{"chart":{"result":[],"error":null}}'),
-        throwsA(isA<YahooParseException>()),
-      );
+      expect(() => parseYahooChart('{"chart":{"result":[],"error":null}}'), throwsA(isA<YahooParseException>()));
     });
   });
 }

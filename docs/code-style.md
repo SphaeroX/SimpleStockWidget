@@ -5,7 +5,7 @@
 ## Werkzeuge
 
 - **Formatter Dart:** `dart format lib tests`
-- **Linter Dart:** `flutter analyze` mit `flutter_lints`. Konfiguration in `analysis_options.yaml` (entsteht in Task 01); die Regeln dort sind maßgeblich.
+- **Linter Dart:** `flutter analyze` mit `flutter_lints`. Konfiguration in `analysis_options.yaml`; die Regeln dort sind maßgeblich. Zeilenbreite 120 (`formatter: page_width: 120`).
 - **Kotlin:** Android-Studio-Standardformat (offizieller Kotlin-Style). Kein zusätzlicher Linter.
 - **Swift:** Xcode-Standardformat. Kein zusätzlicher Linter.
 

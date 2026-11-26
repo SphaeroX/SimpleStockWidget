@@ -19,11 +19,7 @@ QuoteType yahooQuoteType(String? t) => switch (t) {
   _ => QuoteType.other,
 };
 
-MarketState _marketState(
-  Map<String, dynamic> meta,
-  QuoteType type,
-  DateTime now,
-) {
+MarketState _marketState(Map<String, dynamic> meta, QuoteType type, DateTime now) {
   if (type == QuoteType.crypto) return MarketState.open;
   final periods = meta['currentTradingPeriod'];
   if (periods is! Map<String, dynamic>) return MarketState.unknown;
@@ -48,28 +44,18 @@ Quote parseYahooChart(String body, {DateTime? now}) {
     if (results == null || results.isEmpty) {
       throw const YahooParseException('Kein Ergebnis');
     }
-    final meta =
-        (results.first as Map<String, dynamic>)['meta'] as Map<String, dynamic>;
+    final meta = (results.first as Map<String, dynamic>)['meta'] as Map<String, dynamic>;
     final type = yahooQuoteType(meta['instrumentType'] as String?);
     final time = meta['regularMarketTime'] as num?;
     return Quote(
       symbol: meta['symbol'] as String,
       price: (meta['regularMarketPrice'] as num).toDouble(),
-      previousClose:
-          ((meta['chartPreviousClose'] ?? meta['previousClose']) as num)
-              .toDouble(),
+      previousClose: ((meta['chartPreviousClose'] ?? meta['previousClose']) as num).toDouble(),
       currency: meta['currency'] as String,
-      name: (meta['longName'] ?? meta['shortName'] as String?)
-          ?.toString()
-          .trim(),
+      name: (meta['longName'] ?? meta['shortName'] as String?)?.toString().trim(),
       type: type,
       marketState: _marketState(meta, type, now ?? DateTime.now()),
-      marketTime: time == null
-          ? null
-          : DateTime.fromMillisecondsSinceEpoch(
-              time.toInt() * 1000,
-              isUtc: true,
-            ),
+      marketTime: time == null ? null : DateTime.fromMillisecondsSinceEpoch(time.toInt() * 1000, isUtc: true),
     );
   } on YahooParseException {
     rethrow;
@@ -81,18 +67,11 @@ Quote parseYahooChart(String body, {DateTime? now}) {
 const yahooHost = 'query1.finance.yahoo.com';
 const yahooHeaders = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)'};
 
-Uri yahooChartUri(String symbol) => Uri.https(
-  yahooHost,
-  '/v8/finance/chart/$symbol',
-  {'range': '1d', 'interval': '1d'},
-);
+Uri yahooChartUri(String symbol) =>
+    Uri.https(yahooHost, '/v8/finance/chart/$symbol', {'range': '1d', 'interval': '1d'});
 
 /// Ruft ein einzelnes Symbol ab und bildet HTTP-Fehler auf [QuoteException]s ab.
-Future<Quote> fetchYahooChartQuote(
-  http.Client client,
-  String symbol, {
-  DateTime? now,
-}) async {
+Future<Quote> fetchYahooChartQuote(http.Client client, String symbol, {DateTime? now}) async {
   final res = await client.get(yahooChartUri(symbol), headers: yahooHeaders);
   switch (res.statusCode) {
     case 200:

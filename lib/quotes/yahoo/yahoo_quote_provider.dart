@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
@@ -8,11 +9,8 @@ import 'yahoo_chart_parser.dart';
 
 /// [QuoteProvider] auf Basis der inoffiziellen Yahoo-Finance-Chart-API.
 class YahooQuoteProvider implements QuoteProvider {
-  YahooQuoteProvider(
-    this._client, {
-    this.timeout = const Duration(seconds: 10),
-    DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+  YahooQuoteProvider(this._client, {this.timeout = const Duration(seconds: 10), DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
 
   final http.Client _client;
   final Duration timeout;
@@ -26,11 +24,7 @@ class YahooQuoteProvider implements QuoteProvider {
     await Future.wait(
       symbols.toSet().map((s) async {
         try {
-          quotes[s] = await fetchYahooChartQuote(
-            _client,
-            s,
-            now: now,
-          ).timeout(timeout);
+          quotes[s] = await fetchYahooChartQuote(_client, s, now: now).timeout(timeout);
         } on QuoteException catch (e) {
           errors[s] = e;
         } on TimeoutException {
@@ -52,5 +46,41 @@ class YahooQuoteProvider implements QuoteProvider {
   }
 
   @override
-  Future<List<SymbolSearchResult>> search(String query) async => const [];
+  Future<List<SymbolSearchResult>> search(String query) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    final uri = Uri.https(yahooHost, '/v1/finance/search', {
+      'q': q,
+      'quotesCount': '15',
+      'newsCount': '0',
+      'listsCount': '0',
+    });
+    final http.Response res;
+    try {
+      res = await _client.get(uri, headers: yahooHeaders).timeout(timeout);
+    } on TimeoutException {
+      throw const NetworkQuoteException('Timeout bei der Suche');
+    } on http.ClientException catch (e) {
+      throw NetworkQuoteException(e.message);
+    }
+    if (res.statusCode == 429) throw const RateLimitException('Suche');
+    if (res.statusCode != 200) {
+      throw NetworkQuoteException('HTTP ${res.statusCode} bei der Suche');
+    }
+    try {
+      final quotes = (jsonDecode(res.body) as Map<String, dynamic>)['quotes'] as List? ?? const [];
+      return [
+        for (final raw in quotes.cast<Map<String, dynamic>>())
+          if (raw['symbol'] is String && raw['quoteType'] is String)
+            SymbolSearchResult(
+              symbol: raw['symbol'] as String,
+              name: ((raw['longname'] ?? raw['shortname'] ?? raw['symbol']) as String).trim(),
+              type: yahooQuoteType(raw['quoteType'] as String),
+              exchange: raw['exchDisp'] as String?,
+            ),
+      ];
+    } catch (e) {
+      throw ParseQuoteException(e.toString());
+    }
+  }
 }

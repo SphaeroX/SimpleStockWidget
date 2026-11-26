@@ -25,6 +25,5 @@ class Quote {
   final DateTime? marketTime;
 
   double get change => price - previousClose;
-  double get changePercent =>
-      previousClose == 0 ? 0 : change / previousClose * 100;
+  double get changePercent => previousClose == 0 ? 0 : change / previousClose * 100;
 }
