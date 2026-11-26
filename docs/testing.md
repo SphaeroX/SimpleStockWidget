@@ -31,7 +31,7 @@ Wichtig: Immer `tests/` als Pfad angeben. Flutter sucht ohne Pfad nur in `test/`
 
 - Änderung in `lib/<bereich>/` → zuerst `flutter test tests/<bereich>/`.
 - Änderung an gemeinsam genutztem Code (Modelle, Formatierung, Refresh-Ablauf, Widget-Payload) → `flutter test tests/` komplett.
-- Änderung an Kotlin-Widget-Logik → Kotlin-Unit-Tests: `cd android && ./gradlew :app:testDebugUnitTest` (Quellen in `tests/android/`, per `sourceSets` in `android/app/build.gradle.kts` eingebunden; Ergebnisse unter `build/app/test-results/`).
+- Änderung an Kotlin-Widget-Logik → Kotlin-Unit-Tests: `cd android && ./gradlew :app:testDebugUnitTest` (in einem frischen Checkout vorher `flutter build apk --config-only`, das erzeugt `android/gradlew`; Quellen in `tests/android/`, per `sourceSets` in `android/app/build.gradle.kts` eingebunden; Ergebnisse unter `build/app/test-results/`).
 
 ## Fertig-Kriterien
 

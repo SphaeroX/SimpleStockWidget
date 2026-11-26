@@ -46,6 +46,9 @@ jobs:
       - name: Dart-Tests
         run: flutter test tests/
 
+      - name: Gradle-Wrapper erzeugen
+        run: flutter build apk --config-only
+
       - name: Kotlin-Tests (Widget-Logik)
         working-directory: android
         run: ./gradlew :app:testDebugUnitTest --no-daemon
