@@ -1,14 +1,14 @@
-import 'package:http/http.dart' as http;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'quotes/yahoo/yahoo_chart_parser.dart';
+import 'quotes/providers.dart';
 import 'widget_sync/widget_payload.dart';
 import 'widget_sync/widget_storage.dart';
 import 'widget_sync/widget_sync.dart';
 
 void main() {
-  runApp(const SimpleStockApp());
+  runApp(const ProviderScope(child: SimpleStockApp()));
 }
 
 class SimpleStockApp extends StatelessWidget {
@@ -24,35 +24,43 @@ class SimpleStockApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   String _status = 'Noch nicht geladen';
 
   Future<void> _refresh() async {
     setState(() => _status = 'Lade …');
     try {
-      final q = await fetchYahooChartQuote(http.Client(), 'NVDA');
+      final batch = await ref.read(quoteProviderProvider).fetchQuotes(['NVDA']);
+      final q = batch.quotes['NVDA'];
+      if (q == null) throw batch.errors['NVDA'] ?? Exception('Keine Daten');
       final f = NumberFormat('#,##0.00', 'de_DE');
       final now = DateTime.now();
-      await const WidgetSync(HomeWidgetStorage()).publish(WidgetPayload(
-        updatedAt: now,
-        updatedLabel: DateFormat('HH:mm').format(now),
-        rows: [
-          WidgetRow(
-            name: q.symbol,
-            price: f.format(q.price),
-            change: f.format(q.change),
-            direction: q.change > 0 ? Direction.up : (q.change < 0 ? Direction.down : Direction.neutral),
-          ),
-        ],
-      ));
-      setState(() => _status = '${q.symbol}: ${f.format(q.price)} ${q.currency}');
+      await const WidgetSync(HomeWidgetStorage()).publish(
+        WidgetPayload(
+          updatedAt: now,
+          updatedLabel: DateFormat('HH:mm').format(now),
+          rows: [
+            WidgetRow(
+              name: q.symbol,
+              price: f.format(q.price),
+              change: f.format(q.change),
+              direction: q.change > 0
+                  ? Direction.up
+                  : (q.change < 0 ? Direction.down : Direction.neutral),
+            ),
+          ],
+        ),
+      );
+      setState(
+        () => _status = '${q.symbol}: ${f.format(q.price)} ${q.currency}',
+      );
     } catch (e) {
       setState(() => _status = 'Fehler: $e');
     }

@@ -19,7 +19,7 @@ Stand: 2026-11-26 – in Arbeit.
 | Task | Titel | Status |
 |---|---|---|
 | 01 | Durchstich: App → Yahoo → Android-Widget | erledigt |
-| 02 | Provider-Schnittstelle + Yahoo-Provider | offen |
+| 02 | Provider-Schnittstelle + Yahoo-Provider | erledigt |
 | 03 | Watchlist: Suche, Hinzufügen, Entfernen, Sortieren | offen |
 | 04 | Eigene Anzeigenamen | offen |
 | 05 | Währungsumrechnung | offen |
