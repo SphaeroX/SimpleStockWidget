@@ -28,10 +28,10 @@ Jeder Watchlist-Eintrag kann einen frei wählbaren Anzeigenamen bekommen (z. B. 
 
 ## Umsetzungsschritte
 
-1. [ ] Modell um `displayName` erweitern, Laden alter Daten ohne das Feld sicherstellen
-2. [ ] Detailseite pro Eintrag anlegen (wird in 05/06 wiederverwendet)
-3. [ ] Name setzen/löschen (leer = zurück zum Symbol), Längenbegrenzung (z. B. 20 Zeichen)
-4. [ ] Widget-Payload nutzt den effektiven Namen
+1. [x] Modell um `displayName` erweitern, Laden alter Daten ohne das Feld sicherstellen
+2. [x] Detailseite pro Eintrag anlegen (wird in 05/06 wiederverwendet)
+3. [x] Name setzen/löschen (leer = zurück zum Symbol), Längenbegrenzung (z. B. 20 Zeichen)
+4. [x] Widget-Payload nutzt den effektiven Namen
 
 ## Tests
 
@@ -48,8 +48,8 @@ Zu belegendes Verhalten:
 
 Der Task gilt erst als fertig, wenn alle Punkte erfüllt und durch Tests oder einen konkreten Befehl belegt sind:
 
-- [ ] `flutter test tests/` grün
-- [ ] Umbenannter Eintrag erscheint im Widget mit neuem Namen (manuell belegt)
+- [x] `flutter test tests/` grün
+- [x] Umbenannter Eintrag erscheint im Widget mit neuem Namen (manuell belegt)
 
 ## Offene Fragen / Annahmen
 
@@ -63,19 +63,15 @@ Taskspezifische Informationen während der Arbeit hier festhalten. Taskübergrei
 
 Reihenfolge und Details stehen in `AGENTS.md`, Abschnitt "Abschluss- und Archivierungs-Workflow".
 
-- [ ] Alle Akzeptanzkriterien erfüllt, Tests liegen permanent in `tests/` und laufen grün
-- [ ] Abschnitt "Erkenntnisse für Folge-Agenten" unten ausgefüllt
-- [ ] Folge-Tasks und `Roadmap/README.md` geprüft und bei Bedarf angepasst
-- [ ] Datei ohne `RUN_` nach `Roadmap/Archiv/` verschoben
+- [x] Alle Akzeptanzkriterien erfüllt, Tests liegen permanent in `tests/` und laufen grün
+- [x] Abschnitt "Erkenntnisse für Folge-Agenten" unten ausgefüllt
+- [x] Folge-Tasks und `Roadmap/README.md` geprüft und bei Bedarf angepasst
+- [x] Datei ohne `RUN_` nach `Roadmap/Archiv/` verschoben
 
 ## Erkenntnisse für Folge-Agenten
 
-<!-- ERKENNTNISSE-OFFEN: Vor der Archivierung ausfüllen und diese Zeile löschen. -->
-
-Vor der Archivierung vom Agenten auszufüllen. Schreibe so, dass ein Agent, der diesen Task nie gesehen hat, davon bei späteren Tasks profitiert:
-
-- **Umgesetzt (und Abweichungen vom Plan):**
-- **Learnings & Stolpersteine:**
-- **Wichtige Entscheidungen und ihre Gründe:**
-- **Auswirkungen auf Folge-Tasks:**
-- **Hinweise zu Tests und Befehlen:**
+- **Umgesetzt (und Abweichungen vom Plan):** `WatchlistEntry.displayName` (optional, JSON abwärtskompatibel), `effectiveName` (eigener Name sonst Symbol), `withDisplayName` (trimmt, leer → null, max. 20 Zeichen), `lib/app/entry_detail_page.dart` (Detailseite, Tippen auf Eintrag öffnet sie, „Speichern“ → `WatchlistNotifier.replace`). Widget-Payload nutzt `effectiveName`. In der App-Liste steht der eigene Name, sonst der Quellname.
+- **Learnings & Stolpersteine:** Keine besonderen.
+- **Wichtige Entscheidungen und ihre Gründe:** Zu lange Namen werden abgeschnitten statt abgewiesen (einfachere UI, Eingabefeld begrenzt zusätzlich).
+- **Auswirkungen auf Folge-Tasks:** Detailseite hat `_extraSettings()` als Platzhalter für Währungs- und Modus-Auswahl (Tasks 05/06); dort `_draft` zu einer veränderlichen Variable machen und `withDisplayName` auf den Entwurf anwenden. `WatchlistEntry`-Konstruktor um neue Felder erweitern und `withDisplayName` muss sie mitkopieren (am besten `copyWith` einführen).
+- **Hinweise zu Tests und Befehlen:** `flutter test tests/watchlist/ tests/app/`.

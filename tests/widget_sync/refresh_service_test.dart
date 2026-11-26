@@ -10,6 +10,24 @@ import 'package:simple_stock_widget/widget_sync/widget_keys.dart';
 import '../helpers/fakes.dart';
 
 void main() {
+  test('Widget zeigt eigenen Anzeigenamen', () async {
+    final store = InMemoryStore();
+    final repo = WatchlistRepository(store);
+    await repo.save([
+      const WatchlistEntry(symbol: 'IWDA.L', name: 'iShares', type: QuoteType.etf).withDisplayName('msci world'),
+    ]);
+    final widget = InMemoryWidgetStorage();
+    await RefreshService(
+      quotes: FakeQuoteProvider({
+        'IWDA.L': const Quote(symbol: 'IWDA.L', price: 133.99, previousClose: 136.61, currency: 'USD'),
+      }),
+      watchlist: repo,
+      widgetStorage: widget,
+    ).refresh();
+    final json = jsonDecode(widget.data[WidgetKeys.payload]!) as Map<String, dynamic>;
+    expect((json['rows'] as List).single['name'], 'msci world');
+  });
+
   test('Payload enthält Einträge in Watchlist-Reihenfolge', () async {
     final store = InMemoryStore();
     final repo = WatchlistRepository(store);

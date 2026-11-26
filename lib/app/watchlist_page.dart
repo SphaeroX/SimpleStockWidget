@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../watchlist/watchlist_entry.dart';
 import 'providers.dart';
+import 'entry_detail_page.dart';
 import 'search_page.dart';
 
 class WatchlistPage extends ConsumerWidget {
@@ -68,7 +69,12 @@ class _EntryTile extends ConsumerWidget {
         child: const Icon(Icons.delete),
       ),
       onDismissed: (_) => ref.read(watchlistProvider.notifier).remove(entry.symbol),
-      child: ListTile(title: Text(entry.name), subtitle: Text(entry.symbol), trailing: const Icon(Icons.drag_handle)),
+      child: ListTile(
+        title: Text(entry.displayName ?? entry.name),
+        subtitle: Text(entry.displayName == null ? entry.symbol : '${entry.symbol} · ${entry.name}'),
+        trailing: const Icon(Icons.drag_handle),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EntryDetailPage(entry: entry))),
+      ),
     );
   }
 }

@@ -21,7 +21,7 @@ Stand: 2026-11-26 – in Arbeit.
 | 01 | Durchstich: App → Yahoo → Android-Widget | erledigt |
 | 02 | Provider-Schnittstelle + Yahoo-Provider | erledigt |
 | 03 | Watchlist: Suche, Hinzufügen, Entfernen, Sortieren | erledigt |
-| 04 | Eigene Anzeigenamen | offen |
+| 04 | Eigene Anzeigenamen | erledigt |
 | 05 | Währungsumrechnung | offen |
 | 06 | Anzeigemodus %, Betrag oder beides | offen |
 | 07 | Android-Widget: finales Layout | offen |

@@ -32,7 +32,7 @@ class RefreshService {
       if (q == null) continue;
       rows.add(
         WidgetRow(
-          name: e.symbol,
+          name: e.effectiveName,
           price: formatPrice(q.price),
           change: formatSigned(q.change),
           direction: q.change > 0 ? Direction.up : (q.change < 0 ? Direction.down : Direction.neutral),
