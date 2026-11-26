@@ -1,0 +1,54 @@
+# SimpleStockWidget – Roadmap
+
+Projektübergreifendes Gedächtnis. Agenten lesen diese Datei vor jedem Task und aktualisieren sie, wenn sich etwas ergibt, das über einen einzelnen Task hinausgeht. Regeln für die Arbeit: [AGENTS.md](AGENTS.md).
+
+## Projektziel
+
+Ein schlankes Homescreen-Widget für Android (zuerst) und iOS (später), das eine selbst gewählte Liste von Aktien, ETFs, Indizes und Kryptowerten mit aktuellem Kurs und Tagesveränderung anzeigt – im Stil des Referenz-Screenshots (zweispaltige Liste, grün/rot), aber aufgeräumter und mit Reload-Button oben rechts.
+
+**Was die Software tut:** In einer Flutter-Begleit-App sucht der Nutzer Werte (per Name oder Ticker) aus, vergibt optional eigene Anzeigenamen, sortiert sie und legt Anzeigewährung sowie Anzeigemodus der Tagesveränderung fest (Prozent, Betrag oder beides) – global und pro Wert überschreibbar. Die App lädt Kurse über eine austauschbare Provider-Schnittstelle (Standard: Yahoo Finance, inoffiziell) und schreibt fertig aufbereitete Daten in den gemeinsamen Widget-Speicher. Das native Widget zeigt Header mit „Letzter Abruf“, Reload-Button, die Liste und einen Hinweis bei geschlossener Börse oder veralteten Daten. Aktualisierung manuell per Button und automatisch im einstellbaren Intervall (15/30/60 Min).
+
+**Zielgruppe:** Nur der Projektinhaber selbst (private Nutzung, Sideload). Keine Store-Veröffentlichung.
+
+**Nicht-Ziele:** Store-Veröffentlichung, Charts/Kursverläufe, Portfolio/Stückzahlen, Kursalarme, Konten/Cloud-Sync, mehrere Widget-Instanzen mit unterschiedlichen Listen.
+
+## Aktueller Status
+
+Stand: 2026-11-26 – Roadmap angelegt, noch kein Task begonnen.
+
+| Task | Titel | Status |
+|---|---|---|
+| 01 | Durchstich: App → Yahoo → Android-Widget | offen |
+| 02 | Provider-Schnittstelle + Yahoo-Provider | offen |
+| 03 | Watchlist: Suche, Hinzufügen, Entfernen, Sortieren | offen |
+| 04 | Eigene Anzeigenamen | offen |
+| 05 | Währungsumrechnung | offen |
+| 06 | Anzeigemodus %, Betrag oder beides | offen |
+| 07 | Android-Widget: finales Layout | offen |
+| 08 | Android: Reload-Button im Widget | offen |
+| 09 | Android: einstellbares Auto-Update | offen |
+| 10 | Marktstatus und Fehlerzustände | offen |
+| 11 | iOS: Widget-Grundgerüst | offen |
+| 12 | iOS: Reload-Button und Refresh | offen |
+
+Status ist `offen`, `läuft` (Datei trägt das Präfix `RUN_`) oder `erledigt` (Datei liegt in `Archiv/`). Die Tabelle wird beim Archivieren eines Tasks aktualisiert.
+
+## Taskübergreifende Entwicklungsinfos
+
+Globale Informationen, Architekturentscheidungen und Wissen, das für das gesamte Projekt gilt. Wird laufend ergänzt; jeden Eintrag mit dem Task kennzeichnen, aus dem er stammt.
+
+- **Stack (Interview):** Flutter/Dart für App, Datenabruf und Aufbereitung; Widgets nativ: Android mit Kotlin + Jetpack Glance, iOS mit SwiftUI + WidgetKit. Brücke über das Paket `home_widget` (gemeinsamer Key-Value-Speicher, Widget-Update, interaktive Callbacks).
+- **Datenfluss (Interview):** Kurse werden im Dart-Code geholt und fertig formatiert (Strings, Farbrichtung) in den Widget-Speicher geschrieben. Das native Widget rendert nur, es rechnet nicht. Reload und Auto-Update starten den Dart-Code im Hintergrund.
+- **Datenquelle (Interview):** Austauschbar hinter einer `QuoteProvider`-Schnittstelle; Standard-Implementierung Yahoo Finance (inoffiziell, kein API-Key). Symbole im Yahoo-Format (`NVDA`, `EVK.DE`, `IWDA.L`, `^GDAXI`, `BTC-EUR`).
+- **Einstellungen (Interview):** Anzeigewährung und Anzeigemodus (Prozent / Betrag / beides) global, pro Wert überschreibbar. Update-Intervall 15/30/60 Min einstellbar.
+- **Plattform-Reihenfolge (Interview):** Android vollständig zuerst (Tasks 01–10), iOS danach (Tasks 11–12). In der Cloud-Umgebung kann nur Android gebaut werden; iOS braucht später Mac/Xcode oder CI.
+- **Tests:** verbindlich unter `tests/`, Aufruf `flutter test tests/` (siehe `AGENTS.md`).
+
+## Auffälligkeiten & Details
+
+Dinge, die global noch zu beachten sind: Besonderheiten, bekannte Einschränkungen, kleinere Details. Wird laufend ergänzt.
+
+- Yahoo Finance ist eine inoffizielle Schnittstelle (Endpunkte, ggf. Cookie/Crumb, Rate-Limits können sich ändern). Fehler müssen das Widget nie leer machen – letzte Daten bleiben stehen.
+- Android erlaubt periodische Hintergrund-Jobs (WorkManager) frühestens alle 15 Minuten.
+- Zahlenformat deutsch: Tausenderpunkt, Dezimalkomma (`50.182,95`).
+- Laufend ergänzen.
